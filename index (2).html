@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>나만의 시작 홈페이지</title>
+  <style>
+    :root {
+      --bg1: #eef4ff;
+      --bg2: #f8fbff;
+      --card: rgba(255,255,255,0.88);
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #4f7cff;
+      --accent-dark: #365fe0;
+      --border: #dbe5ff;
+      --danger: #ef4444;
+      --shadow: 0 18px 50px rgba(63, 92, 145, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #dfe9ff 0, transparent 38%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 18px;
+    }
+
+    .container {
+      width: min(920px, 100%);
+      display: grid;
+      gap: 22px;
+    }
+
+    .hero, .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      border-radius: 26px;
+    }
+
+    .hero {
+      padding: 42px 34px;
+      text-align: center;
+    }
+
+    .date {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+
+    .time {
+      font-size: clamp(3rem, 10vw, 6.2rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin: 8px 0 30px;
+    }
+
+    .search {
+      display: flex;
+      gap: 10px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .search input, .todo-form input {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text);
+      border-radius: 15px;
+      padding: 15px 17px;
+      font-size: 1rem;
+      outline: none;
+      transition: .2s ease;
+    }
+
+    .search input:focus, .todo-form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(79,124,255,.12);
+    }
+
+    button {
+      border: 0;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: .2s ease;
+    }
+
+    .search button, .todo-form button {
+      background: var(--accent);
+      color: white;
+      padding: 0 22px;
+      white-space: nowrap;
+    }
+
+    .search button:hover, .todo-form button:hover {
+      background: var(--accent-dark);
+      transform: translateY(-1px);
+    }
+
+    .card {
+      padding: 28px;
+    }
+
+    .card h2 {
+      margin: 0 0 18px;
+      font-size: 1.35rem;
+    }
+
+    .todo-form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .todo-list {
+      display: grid;
+      gap: 10px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,.76);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 13px 14px;
+    }
+
+    .todo-item input[type="checkbox"] {
+      width: 19px;
+      height: 19px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .todo-text {
+      flex: 1;
+      word-break: break-word;
+    }
+
+    .todo-item.done .todo-text {
+      text-decoration: line-through;
+      color: #9ca3af;
+    }
+
+    .delete {
+      background: transparent;
+      color: var(--muted);
+      font-size: 1rem;
+      padding: 7px 9px;
+    }
+
+    .delete:hover {
+      color: var(--danger);
+      background: #fff1f2;
+    }
+
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 20px 0 6px;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    @media (max-width: 600px) {
+      .hero { padding: 34px 20px; }
+      .card { padding: 22px 18px; }
+      .search, .todo-form { flex-direction: column; }
+      .search button, .todo-form button { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <div class="date" id="date">날짜 불러오는 중...</div>
+      <div class="time" id="time">00:00:00</div>
+
+      <form class="search" action="https://www.google.com/search" method="get">
+        <input
+          type="text"
+          name="q"
+          placeholder="Google에서 검색"
+          aria-label="구글 검색어"
+          autocomplete="off"
+        />
+        <button type="submit">검색</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>오늘의 할 일</h2>
+      <form class="todo-form" id="todoForm">
+        <input
+          id="todoInput"
+          type="text"
+          placeholder="할 일을 입력하세요"
+          maxlength="100"
+          autocomplete="off"
+        />
+        <button type="submit">추가</button>
+      </form>
+      <ul class="todo-list" id="todoList"></ul>
+      <div class="empty" id="emptyMessage">아직 등록된 할 일이 없어요.</div>
+    </section>
+
+    <div class="footer">할 일은 이 브라우저에 자동 저장됩니다.</div>
+  </main>
+
+  <script>
+    const dateEl = document.getElementById("date");
+    const timeEl = document.getElementById("time");
+
+    function updateClock() {
+      const now = new Date();
+
+      const dateText = new Intl.DateTimeFormat("ko-KR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        weekday: "long"
+      }).format(now);
+
+      const timeText = new Intl.DateTimeFormat("ko-KR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+      }).format(now);
+
+      dateEl.textContent = dateText;
+      timeEl.textContent = timeText;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    const todoForm = document.getElementById("todoForm");
+    const todoInput = document.getElementById("todoInput");
+    const todoList = document.getElementById("todoList");
+    const emptyMessage = document.getElementById("emptyMessage");
+
+    let todos = JSON.parse(localStorage.getItem("startPageTodos") || "[]");
+
+    function saveTodos() {
+      localStorage.setItem("startPageTodos", JSON.stringify(todos));
+    }
+
+    function renderTodos() {
+      todoList.innerHTML = "";
+      emptyMessage.style.display = todos.length ? "none" : "block";
+
+      todos.forEach((todo, index) => {
+        const li = document.createElement("li");
+        li.className = "todo-item" + (todo.done ? " done" : "");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = todo.done;
+        checkbox.setAttribute("aria-label", "할 일 완료 여부");
+        checkbox.addEventListener("change", () => {
+          todos[index].done = checkbox.checked;
+          saveTodos();
+          renderTodos();
+        });
+
+        const span = document.createElement("span");
+        span.className = "todo-text";
+        span.textContent = todo.text;
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete";
+        deleteBtn.type = "button";
+        deleteBtn.textContent = "삭제";
+        deleteBtn.addEventListener("click", () => {
+          todos.splice(index, 1);
+          saveTodos();
+          renderTodos();
+        });
+
+        li.append(checkbox, span, deleteBtn);
+        todoList.appendChild(li);
+      });
+    }
+
+    todoForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const text = todoInput.value.trim();
+      if (!text) return;
+
+      todos.push({ text, done: false });
+      todoInput.value = "";
+      saveTodos();
+      renderTodos();
+      todoInput.focus();
+    });
+
+    renderTodos();
+  </script>
+</body>
+</html>
