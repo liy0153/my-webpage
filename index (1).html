@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>새 시작 · 홈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  :root{
+    --bg-top:#EDE6F5;
+    --bg-bottom:#F7E9DE;
+    --ink:#2B2E4A;
+    --ink-soft:#5B5F7A;
+    --accent:#3E7C6B;
+    --accent-soft:#DCEAE5;
+    --panel:rgba(255,255,255,0.55);
+    --panel-border:rgba(255,255,255,0.65);
+    --divider:rgba(43,46,74,0.12);
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Pretendard', -apple-system, sans-serif;
+    color:var(--ink);
+    background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 20px;
+  }
+
+  @media (prefers-reduced-motion: no-preference){
+    body{ animation:fade-in 0.6s ease both; }
+  }
+  @keyframes fade-in{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .panel{
+    width:100%;
+    max-width:560px;
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border-radius:28px;
+    padding:48px 40px 40px;
+    box-shadow:0 30px 60px -30px rgba(43,46,74,0.25);
+  }
+
+  /* ---- clock ---- */
+  .clock-wrap{
+    text-align:center;
+    margin-bottom:28px;
+  }
+  .clock{
+    font-family:'Noto Serif KR', serif;
+    font-weight:300;
+    font-size:clamp(48px, 11vw, 72px);
+    letter-spacing:1px;
+    line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  .date{
+    margin-top:10px;
+    font-size:15px;
+    color:var(--ink-soft);
+    letter-spacing:0.2px;
+  }
+
+  .divider{
+    height:1px;
+    background:var(--divider);
+    margin:28px 0;
+    border:none;
+  }
+
+  /* ---- search ---- */
+  .search-form{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:rgba(255,255,255,0.65);
+    border:1px solid var(--panel-border);
+    border-radius:999px;
+    padding:6px 8px 6px 20px;
+    transition:border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .search-form:focus-within{
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft);
+  }
+  .search-form input{
+    flex:1;
+    border:none;
+    background:transparent;
+    outline:none;
+    font-family:'Pretendard', sans-serif;
+    font-size:15px;
+    color:var(--ink);
+    padding:10px 0;
+  }
+  .search-form input::placeholder{ color:#9EA1B8; }
+  .search-btn{
+    border:none;
+    background:var(--ink);
+    color:#fff;
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    transition:background 0.2s ease;
+  }
+  .search-btn:hover{ background:var(--accent); }
+  .search-btn svg{ width:16px; height:16px; }
+
+  /* ---- todo ---- */
+  .todo-heading{
+    font-size:15px;
+    font-weight:600;
+    margin:0 0 16px 2px;
+    color:var(--ink);
+  }
+  .todo-add{
+    display:flex;
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .todo-add input{
+    flex:1;
+    border:1px solid var(--panel-border);
+    background:rgba(255,255,255,0.65);
+    border-radius:12px;
+    padding:11px 14px;
+    font-family:'Pretendard', sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    outline:none;
+    transition:border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .todo-add input:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft);
+  }
+  .todo-add button{
+    border:none;
+    background:var(--ink);
+    color:#fff;
+    border-radius:12px;
+    padding:0 18px;
+    font-family:'Pretendard', sans-serif;
+    font-size:14px;
+    cursor:pointer;
+    transition:background 0.2s ease;
+  }
+  .todo-add button:hover{ background:var(--accent); }
+
+  .todo-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+  }
+  .todo-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px 2px;
+    border-bottom:1px solid var(--divider);
+  }
+  .todo-item:last-child{ border-bottom:none; }
+
+  .todo-check{
+    width:19px;
+    height:19px;
+    flex-shrink:0;
+    border-radius:6px;
+    border:1.5px solid #B9BCCE;
+    background:transparent;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:background 0.2s ease, border-color 0.2s ease;
+  }
+  .todo-check.checked{
+    background:var(--accent);
+    border-color:var(--accent);
+  }
+  .todo-check svg{ width:11px; height:11px; opacity:0; transition:opacity 0.15s ease; }
+  .todo-check.checked svg{ opacity:1; }
+
+  .todo-text{
+    flex:1;
+    font-size:14px;
+    color:var(--ink);
+    word-break:break-word;
+  }
+  .todo-text.done{
+    color:#A6A9BC;
+    text-decoration:line-through;
+  }
+
+  .todo-remove{
+    border:none;
+    background:transparent;
+    color:#C3C6D6;
+    cursor:pointer;
+    font-size:16px;
+    line-height:1;
+    padding:4px;
+    flex-shrink:0;
+    transition:color 0.2s ease;
+  }
+  .todo-remove:hover{ color:#D9736A; }
+
+  .todo-empty{
+    font-size:13px;
+    color:#9EA1B8;
+    padding:12px 2px;
+  }
+
+  @media (max-width:480px){
+    .panel{ padding:36px 24px 32px; border-radius:22px; }
+  }
+</style>
+</head>
+<body>
+
+<main class="panel">
+
+  <section class="clock-wrap">
+    <div class="clock" id="clock">00:00:00</div>
+    <div class="date" id="date">-</div>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="search-form" id="searchForm">
+      <input type="text" name="q" id="searchInput" placeholder="검색어를 입력하세요" autocomplete="off">
+      <button type="button" class="search-btn" id="searchBtn" aria-label="검색">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <p class="todo-heading">오늘의 할 일</p>
+    <div class="todo-add" id="todoForm">
+      <input type="text" id="todoInput" placeholder="할 일을 입력하세요" autocomplete="off">
+      <button type="button" id="todoAddBtn">추가</button>
+    </div>
+    <ul class="todo-list" id="todoList"></ul>
+  </section>
+
+</main>
+
+<script>
+  // ---- 시계 & 날짜 ----
+  const clockEl = document.getElementById('clock');
+  const dateEl = document.getElementById('date');
+  const weekdays = ['일','월','화','수','목','금','토'];
+
+  function updateClock(){
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    const ss = String(now.getSeconds()).padStart(2,'0');
+    clockEl.textContent = `${hh}:${mm}:${ss}`;
+
+    const y = now.getFullYear();
+    const m = now.getMonth()+1;
+    const d = now.getDate();
+    const w = weekdays[now.getDay()];
+    dateEl.textContent = `${y}년 ${m}월 ${d}일 ${w}요일`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // ---- 검색 (같은 탭에서 이동, 팝업 차단 환경에서도 동작) ----
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+
+  function doSearch(){
+    const q = searchInput.value.trim();
+    if(!q) return;
+    window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(q);
+  }
+
+  searchBtn.addEventListener('click', doSearch);
+  searchInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      doSearch();
+    }
+  });
+
+  // ---- 할 일 목록 (localStorage 저장, 접근 불가 환경에서도 항상 동작) ----
+  const STORAGE_KEY = 'my-start-page-todos';
+  const todoInput = document.getElementById('todoInput');
+  const todoAddBtn = document.getElementById('todoAddBtn');
+  const todoList = document.getElementById('todoList');
+
+  let memoryTodos = []; // localStorage를 쓸 수 없는 환경을 위한 대체 저장소
+
+  function loadTodos(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){
+      return memoryTodos;
+    }
+  }
+
+  function saveTodos(list){
+    memoryTodos = list;
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }catch(e){
+      // localStorage를 쓸 수 없는 환경(예: 미리보기 창)에서는
+      // 메모리에만 저장되며, 새로고침 시 초기화될 수 있어요.
+    }
+  }
+
+  let todos = loadTodos();
+
+  function renderTodos(){
+    todoList.innerHTML = '';
+
+    if(todos.length === 0){
+      const empty = document.createElement('li');
+      empty.className = 'todo-empty';
+      empty.textContent = '아직 할 일이 없어요. 위에 입력해 추가해보세요.';
+      todoList.appendChild(empty);
+      return;
+    }
+
+    todos.forEach((todo, index) => {
+      const li = document.createElement('li');
+      li.className = 'todo-item';
+
+      const check = document.createElement('button');
+      check.type = 'button';
+      check.className = 'todo-check' + (todo.done ? ' checked' : '');
+      check.setAttribute('aria-label', todo.done ? '완료 취소' : '완료로 표시');
+      check.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      check.addEventListener('click', () => {
+        todos[index].done = !todos[index].done;
+        saveTodos(todos);
+        renderTodos();
+      });
+
+      const text = document.createElement('span');
+      text.className = 'todo-text' + (todo.done ? ' done' : '');
+      text.textContent = todo.text;
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'todo-remove';
+      remove.setAttribute('aria-label', '삭제');
+      remove.textContent = '✕';
+      remove.addEventListener('click', () => {
+        todos.splice(index, 1);
+        saveTodos(todos);
+        renderTodos();
+      });
+
+      li.appendChild(check);
+      li.appendChild(text);
+      li.appendChild(remove);
+      todoList.appendChild(li);
+    });
+  }
+
+  function addTodo(){
+    const value = todoInput.value.trim();
+    if(!value) return;
+    todos.push({ text: value, done: false });
+    saveTodos(todos);
+    todoInput.value = '';
+    renderTodos();
+    todoInput.focus();
+  }
+
+  todoAddBtn.addEventListener('click', addTodo);
+  todoInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      addTodo();
+    }
+  });
+
+  renderTodos();
+</script>
+
+</body>
+</html>
