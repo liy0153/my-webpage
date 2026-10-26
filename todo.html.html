@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오늘의 할 일</title>
+<style>
+:root{
+  --bg:#e9eef0; --paper:#fbfcfc; --ink:#17283b; --muted:#66788a; --line:#d3dce2;
+  --study:#2f55d4; --study-bg:#e3e9fb; --life:#0e8a76; --life-bg:#dcf1ec;
+  --done:#9aa9b6; --danger:#c0392b; --accent:#17283b;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.5;padding:24px 16px 48px}
+.app{max-width:640px;margin:0 auto}
+h1{font-size:2rem;margin:0 0 4px;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:0 0 20px}
+.datebar{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.datebar input{flex:1;min-width:0;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}
+button{font:inherit;cursor:pointer;color:var(--ink)}
+.icon-btn{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 14px}
+.icon-btn:hover{background:#fff;border-color:var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--accent);color:#fff;border-radius:14px;overflow:hidden}
+.stat{padding:16px 12px;text-align:center}
+.stat+.stat{border-left:1px solid rgba(255,255,255,.18)}
+.stat b{display:block;font-size:2.1rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.85rem;opacity:.8}
+.bar{height:6px;background:var(--line);border-radius:3px;margin:10px 0 22px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--life);transition:width .35s}
+form{display:flex;flex-wrap:wrap;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px}
+form input[type=text]{flex:1 1 200px;min-width:0;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;color:var(--ink);background:#fff}
+select{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+.primary{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:10px 18px;font-weight:600}
+.primary:hover{background:#26405d}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:22px 0 10px;align-items:center}
+.tab{border:1px solid var(--line);background:transparent;border-radius:999px;padding:6px 14px;font-size:.92rem}
+.tab[aria-pressed=true]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tabs .gap{flex:1}
+ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+li{display:flex;align-items:center;gap:12px;background:var(--paper);border:1px solid var(--line);border-left-width:5px;border-radius:12px;padding:12px}
+li.study{border-left-color:var(--study)} li.life{border-left-color:var(--life)}
+li input[type=checkbox]{width:22px;height:22px;accent-color:var(--life);flex:none;cursor:pointer}
+.txt{flex:1;min-width:0;word-break:break-word}
+li.done .txt{text-decoration:line-through;color:var(--done)}
+.chip{font-size:.78rem;padding:2px 9px;border-radius:999px;margin-left:8px;white-space:nowrap}
+.study .chip{background:var(--study-bg);color:var(--study)} .life .chip{background:var(--life-bg);color:var(--life)}
+.acts{display:flex;gap:4px}
+.acts button{border:0;background:transparent;color:var(--muted);padding:6px 8px;border-radius:8px;font-size:.88rem}
+.acts button:hover{background:var(--bg);color:var(--ink)}
+.acts .del:hover{color:var(--danger)}
+.edit{flex:1;display:flex;gap:6px;flex-wrap:wrap}
+.edit input{flex:1 1 140px;min-width:0;font:inherit;padding:6px 10px;border:1px solid var(--ink);border-radius:8px}
+.empty{text-align:center;color:var(--muted);padding:32px 12px;border:1px dashed var(--line);border-radius:12px}
+.foot{display:flex;justify-content:space-between;gap:8px;margin-top:20px;flex-wrap:wrap}
+.foot button{border:0;background:transparent;color:var(--muted);text-decoration:underline;padding:4px}
+:focus-visible{outline:3px solid #f2b705;outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<main class="app">
+  <h1>오늘의 할 일</h1>
+  <p class="sub" id="sub"></p>
+
+  <div class="datebar">
+    <button class="icon-btn" id="prev" aria-label="이전 날짜">‹</button>
+    <input type="date" id="date" aria-label="날짜 선택">
+    <button class="icon-btn" id="next" aria-label="다음 날짜">›</button>
+    <button class="icon-btn" id="today">오늘</button>
+  </div>
+
+  <section class="stats" aria-label="할 일 현황">
+    <div class="stat"><b id="nTotal">0</b><span>전체</span></div>
+    <div class="stat"><b id="nDone">0</b><span>완료</span></div>
+    <div class="stat"><b id="nLeft">0</b><span>남은 일</span></div>
+  </section>
+  <div class="bar" aria-hidden="true"><i id="fill"></i></div>
+
+  <form id="form">
+    <input type="text" id="input" placeholder="할 일을 입력하세요" maxlength="100" required aria-label="할 일 입력">
+    <select id="cat" aria-label="카테고리">
+      <option value="study">학업</option>
+      <option value="life">일상</option>
+    </select>
+    <button class="primary" type="submit">추가</button>
+  </form>
+
+  <div class="tabs" role="group" aria-label="목록 필터">
+    <button class="tab" data-f="all" aria-pressed="true">전체</button>
+    <button class="tab" data-f="todo" aria-pressed="false">진행</button>
+    <button class="tab" data-f="done" aria-pressed="false">완료</button>
+    <span class="gap"></span>
+    <button class="tab" data-c="all" aria-pressed="true">모든 분류</button>
+    <button class="tab" data-c="study" aria-pressed="false">학업</button>
+    <button class="tab" data-c="life" aria-pressed="false">일상</button>
+  </div>
+
+  <ul id="list"></ul>
+
+  <div class="foot">
+    <button id="clearDone">이 날짜의 완료 항목 지우기</button>
+    <button id="save">HTML 문서로 저장</button>
+  </div>
+</main>
+
+<script>
+(function(){
+  var KEY = 'todayTodos.v1';
+  var mem = null;
+  var todos = load();
+  var state = { date: ymd(new Date()), f: 'all', c: 'all', editing: null };
+
+  function load(){
+    try { var r = localStorage.getItem(KEY); return r ? JSON.parse(r) : []; }
+    catch(e){ return mem || []; }
+  }
+  function persist(){
+    try { localStorage.setItem(KEY, JSON.stringify(todos)); }
+    catch(e){ mem = todos; }
+  }
+  function ymd(d){
+    var m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+    return d.getFullYear()+'-'+m+'-'+day;
+  }
+  function parse(s){ var p = s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+  function shift(n){ var d = parse(state.date); d.setDate(d.getDate()+n); setDate(ymd(d)); }
+  function setDate(s){ if(!s) return; state.date = s; state.editing = null; render(); }
+  function esc(s){ return s.replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  var CAT = { study:'학업', life:'일상' };
+  var $ = function(id){ return document.getElementById(id); };
+
+  function render(){
+    var day = todos.filter(function(t){ return t.date === state.date; });
+    var done = day.filter(function(t){ return t.done; }).length;
+    $('nTotal').textContent = day.length;
+    $('nDone').textContent = done;
+    $('nLeft').textContent = day.length - done;
+    $('fill').style.width = day.length ? Math.round(done/day.length*100)+'%' : '0';
+    $('date').value = state.date;
+    var d = parse(state.date);
+    var isToday = state.date === ymd(new Date());
+    $('sub').textContent = d.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'long'}) + (isToday ? ' · 오늘' : '');
+
+    document.querySelectorAll('[data-f]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.f === state.f); });
+    document.querySelectorAll('[data-c]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.c === state.c); });
+
+    var shown = day.filter(function(t){
+      return (state.f === 'all' || (state.f === 'done') === t.done) && (state.c === 'all' || t.cat === state.c);
+    });
+    var ul = $('list');
+    if(!shown.length){
+      var msg = day.length ? '조건에 맞는 할 일이 없어요.' : '이 날짜에 등록된 할 일이 없어요. 위에서 첫 할 일을 추가해 보세요.';
+      ul.innerHTML = '<li class="empty" style="display:block;border-left-width:1px">'+msg+'</li>';
+      return;
+    }
+    ul.innerHTML = shown.map(function(t){
+      if(state.editing === t.id){
+        return '<li class="'+t.cat+'"><div class="edit">'+
+          '<input type="text" id="editText" value="'+esc(t.text)+'" maxlength="100" aria-label="할 일 수정">'+
+          '<select id="editCat"><option value="study"'+(t.cat==='study'?' selected':'')+'>학업</option><option value="life"'+(t.cat==='life'?' selected':'')+'>일상</option></select>'+
+          '<button class="primary" data-a="saveEdit" data-id="'+t.id+'">저장</button>'+
+          '<button class="icon-btn" data-a="cancel">취소</button></div></li>';
+      }
+      return '<li class="'+t.cat+(t.done?' done':'')+'">'+
+        '<input type="checkbox" data-a="toggle" data-id="'+t.id+'"'+(t.done?' checked':'')+' aria-label="완료 체크">'+
+        '<div class="txt">'+esc(t.text)+'<span class="chip">'+CAT[t.cat]+'</span></div>'+
+        '<div class="acts"><button data-a="edit" data-id="'+t.id+'">수정</button><button class="del" data-a="del" data-id="'+t.id+'">삭제</button></div></li>';
+    }).join('');
+    var ed = $('editText'); if(ed){ ed.focus(); ed.setSelectionRange(ed.value.length, ed.value.length); }
+  }
+
+  $('form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var text = $('input').value.trim();
+    if(!text) return;
+    todos.push({ id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), text: text, cat: $('cat').value, done: false, date: state.date });
+    persist(); $('input').value = ''; $('input').focus(); render();
+  });
+
+  $('list').addEventListener('click', function(e){
+    var b = e.target.closest('[data-a]'); if(!b) return;
+    var id = b.dataset.id, a = b.dataset.a;
+    var t = todos.filter(function(x){ return x.id === id; })[0];
+    if(a === 'toggle'){ t.done = b.checked; persist(); render(); }
+    else if(a === 'del'){ todos = todos.filter(function(x){ return x.id !== id; }); persist(); render(); }
+    else if(a === 'edit'){ state.editing = id; render(); }
+    else if(a === 'cancel'){ state.editing = null; render(); }
+    else if(a === 'saveEdit'){ saveEdit(t); }
+  });
+  $('list').addEventListener('keydown', function(e){
+    if(e.target.id !== 'editText') return;
+    if(e.key === 'Enter'){ e.preventDefault(); saveEdit(todos.filter(function(x){ return x.id === state.editing; })[0]); }
+    if(e.key === 'Escape'){ state.editing = null; render(); }
+  });
+  function saveEdit(t){
+    var v = $('editText').value.trim();
+    if(v){ t.text = v; t.cat = $('editCat').value; persist(); }
+    state.editing = null; render();
+  }
+
+  document.querySelectorAll('[data-f]').forEach(function(b){ b.addEventListener('click', function(){ state.f = b.dataset.f; render(); }); });
+  document.querySelectorAll('[data-c]').forEach(function(b){ b.addEventListener('click', function(){ state.c = b.dataset.c; render(); }); });
+  $('prev').addEventListener('click', function(){ shift(-1); });
+  $('next').addEventListener('click', function(){ shift(1); });
+  $('today').addEventListener('click', function(){ setDate(ymd(new Date())); });
+  $('date').addEventListener('change', function(e){ setDate(e.target.value); });
+  $('clearDone').addEventListener('click', function(){
+    todos = todos.filter(function(t){ return !(t.date === state.date && t.done); }); persist(); render();
+  });
+
+  // 현재 문서를 하나의 HTML 파일로 저장 (할 일 데이터 포함)
+  $('save').addEventListener('click', function(){
+    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    var data = JSON.stringify(todos).replace(/</g,'\\u003c');
+    html = html.replace("var todos = load();", "var todos = load(); if(!todos.length){ todos = " + data.replace(/\$/g,'$$$$') + "; }");
+    var blob = new Blob([html], { type: 'text/html' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'index.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
