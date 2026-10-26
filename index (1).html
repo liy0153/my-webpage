@@ -2,407 +2,227 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>새 시작 · 홈</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오늘의 할 일</title>
 <style>
-  :root{
-    --bg-top:#EDE6F5;
-    --bg-bottom:#F7E9DE;
-    --ink:#2B2E4A;
-    --ink-soft:#5B5F7A;
-    --accent:#3E7C6B;
-    --accent-soft:#DCEAE5;
-    --panel:rgba(255,255,255,0.55);
-    --panel-border:rgba(255,255,255,0.65);
-    --divider:rgba(43,46,74,0.12);
-  }
-
-  *{box-sizing:border-box;}
-
-  body{
-    margin:0;
-    min-height:100vh;
-    font-family:'Pretendard', -apple-system, sans-serif;
-    color:var(--ink);
-    background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:32px 20px;
-  }
-
-  @media (prefers-reduced-motion: no-preference){
-    body{ animation:fade-in 0.6s ease both; }
-  }
-  @keyframes fade-in{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
-
-  .panel{
-    width:100%;
-    max-width:560px;
-    background:var(--panel);
-    border:1px solid var(--panel-border);
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
-    border-radius:28px;
-    padding:48px 40px 40px;
-    box-shadow:0 30px 60px -30px rgba(43,46,74,0.25);
-  }
-
-  /* ---- clock ---- */
-  .clock-wrap{
-    text-align:center;
-    margin-bottom:28px;
-  }
-  .clock{
-    font-family:'Noto Serif KR', serif;
-    font-weight:300;
-    font-size:clamp(48px, 11vw, 72px);
-    letter-spacing:1px;
-    line-height:1;
-    font-variant-numeric:tabular-nums;
-  }
-  .date{
-    margin-top:10px;
-    font-size:15px;
-    color:var(--ink-soft);
-    letter-spacing:0.2px;
-  }
-
-  .divider{
-    height:1px;
-    background:var(--divider);
-    margin:28px 0;
-    border:none;
-  }
-
-  /* ---- search ---- */
-  .search-form{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    background:rgba(255,255,255,0.65);
-    border:1px solid var(--panel-border);
-    border-radius:999px;
-    padding:6px 8px 6px 20px;
-    transition:border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  .search-form:focus-within{
-    border-color:var(--accent);
-    box-shadow:0 0 0 3px var(--accent-soft);
-  }
-  .search-form input{
-    flex:1;
-    border:none;
-    background:transparent;
-    outline:none;
-    font-family:'Pretendard', sans-serif;
-    font-size:15px;
-    color:var(--ink);
-    padding:10px 0;
-  }
-  .search-form input::placeholder{ color:#9EA1B8; }
-  .search-btn{
-    border:none;
-    background:var(--ink);
-    color:#fff;
-    width:38px;
-    height:38px;
-    border-radius:50%;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-    transition:background 0.2s ease;
-  }
-  .search-btn:hover{ background:var(--accent); }
-  .search-btn svg{ width:16px; height:16px; }
-
-  /* ---- todo ---- */
-  .todo-heading{
-    font-size:15px;
-    font-weight:600;
-    margin:0 0 16px 2px;
-    color:var(--ink);
-  }
-  .todo-add{
-    display:flex;
-    gap:8px;
-    margin-bottom:16px;
-  }
-  .todo-add input{
-    flex:1;
-    border:1px solid var(--panel-border);
-    background:rgba(255,255,255,0.65);
-    border-radius:12px;
-    padding:11px 14px;
-    font-family:'Pretendard', sans-serif;
-    font-size:14px;
-    color:var(--ink);
-    outline:none;
-    transition:border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  .todo-add input:focus{
-    border-color:var(--accent);
-    box-shadow:0 0 0 3px var(--accent-soft);
-  }
-  .todo-add button{
-    border:none;
-    background:var(--ink);
-    color:#fff;
-    border-radius:12px;
-    padding:0 18px;
-    font-family:'Pretendard', sans-serif;
-    font-size:14px;
-    cursor:pointer;
-    transition:background 0.2s ease;
-  }
-  .todo-add button:hover{ background:var(--accent); }
-
-  .todo-list{
-    list-style:none;
-    margin:0;
-    padding:0;
-    display:flex;
-    flex-direction:column;
-  }
-  .todo-item{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:11px 2px;
-    border-bottom:1px solid var(--divider);
-  }
-  .todo-item:last-child{ border-bottom:none; }
-
-  .todo-check{
-    width:19px;
-    height:19px;
-    flex-shrink:0;
-    border-radius:6px;
-    border:1.5px solid #B9BCCE;
-    background:transparent;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    transition:background 0.2s ease, border-color 0.2s ease;
-  }
-  .todo-check.checked{
-    background:var(--accent);
-    border-color:var(--accent);
-  }
-  .todo-check svg{ width:11px; height:11px; opacity:0; transition:opacity 0.15s ease; }
-  .todo-check.checked svg{ opacity:1; }
-
-  .todo-text{
-    flex:1;
-    font-size:14px;
-    color:var(--ink);
-    word-break:break-word;
-  }
-  .todo-text.done{
-    color:#A6A9BC;
-    text-decoration:line-through;
-  }
-
-  .todo-remove{
-    border:none;
-    background:transparent;
-    color:#C3C6D6;
-    cursor:pointer;
-    font-size:16px;
-    line-height:1;
-    padding:4px;
-    flex-shrink:0;
-    transition:color 0.2s ease;
-  }
-  .todo-remove:hover{ color:#D9736A; }
-
-  .todo-empty{
-    font-size:13px;
-    color:#9EA1B8;
-    padding:12px 2px;
-  }
-
-  @media (max-width:480px){
-    .panel{ padding:36px 24px 32px; border-radius:22px; }
-  }
+:root{
+  --bg:#e9eef0; --paper:#fbfcfc; --ink:#17283b; --muted:#66788a; --line:#d3dce2;
+  --study:#2f55d4; --study-bg:#e3e9fb; --life:#0e8a76; --life-bg:#dcf1ec;
+  --done:#9aa9b6; --danger:#c0392b; --accent:#17283b;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.5;padding:24px 16px 48px}
+.app{max-width:640px;margin:0 auto}
+h1{font-size:2rem;margin:0 0 4px;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:0 0 20px}
+.datebar{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.datebar input{flex:1;min-width:0;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}
+button{font:inherit;cursor:pointer;color:var(--ink)}
+.icon-btn{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 14px}
+.icon-btn:hover{background:#fff;border-color:var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--accent);color:#fff;border-radius:14px;overflow:hidden}
+.stat{padding:16px 12px;text-align:center}
+.stat+.stat{border-left:1px solid rgba(255,255,255,.18)}
+.stat b{display:block;font-size:2.1rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.85rem;opacity:.8}
+.bar{height:6px;background:var(--line);border-radius:3px;margin:10px 0 22px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--life);transition:width .35s}
+form{display:flex;flex-wrap:wrap;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px}
+form input[type=text]{flex:1 1 200px;min-width:0;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;color:var(--ink);background:#fff}
+select{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+.primary{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:10px 18px;font-weight:600}
+.primary:hover{background:#26405d}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:22px 0 10px;align-items:center}
+.tab{border:1px solid var(--line);background:transparent;border-radius:999px;padding:6px 14px;font-size:.92rem}
+.tab[aria-pressed=true]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tabs .gap{flex:1}
+ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+li{display:flex;align-items:center;gap:12px;background:var(--paper);border:1px solid var(--line);border-left-width:5px;border-radius:12px;padding:12px}
+li.study{border-left-color:var(--study)} li.life{border-left-color:var(--life)}
+li input[type=checkbox]{width:22px;height:22px;accent-color:var(--life);flex:none;cursor:pointer}
+.txt{flex:1;min-width:0;word-break:break-word}
+li.done .txt{text-decoration:line-through;color:var(--done)}
+.chip{font-size:.78rem;padding:2px 9px;border-radius:999px;margin-left:8px;white-space:nowrap}
+.study .chip{background:var(--study-bg);color:var(--study)} .life .chip{background:var(--life-bg);color:var(--life)}
+.acts{display:flex;gap:4px}
+.acts button{border:0;background:transparent;color:var(--muted);padding:6px 8px;border-radius:8px;font-size:.88rem}
+.acts button:hover{background:var(--bg);color:var(--ink)}
+.acts .del:hover{color:var(--danger)}
+.edit{flex:1;display:flex;gap:6px;flex-wrap:wrap}
+.edit input{flex:1 1 140px;min-width:0;font:inherit;padding:6px 10px;border:1px solid var(--ink);border-radius:8px}
+.empty{text-align:center;color:var(--muted);padding:32px 12px;border:1px dashed var(--line);border-radius:12px}
+.foot{display:flex;justify-content:space-between;gap:8px;margin-top:20px;flex-wrap:wrap}
+.foot button{border:0;background:transparent;color:var(--muted);text-decoration:underline;padding:4px}
+:focus-visible{outline:3px solid #f2b705;outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
 </head>
 <body>
+<main class="app">
+  <h1>오늘의 할 일</h1>
+  <p class="sub" id="sub"></p>
 
-<main class="panel">
+  <div class="datebar">
+    <button class="icon-btn" id="prev" aria-label="이전 날짜">‹</button>
+    <input type="date" id="date" aria-label="날짜 선택">
+    <button class="icon-btn" id="next" aria-label="다음 날짜">›</button>
+    <button class="icon-btn" id="today">오늘</button>
+  </div>
 
-  <section class="clock-wrap">
-    <div class="clock" id="clock">00:00:00</div>
-    <div class="date" id="date">-</div>
+  <section class="stats" aria-label="할 일 현황">
+    <div class="stat"><b id="nTotal">0</b><span>전체</span></div>
+    <div class="stat"><b id="nDone">0</b><span>완료</span></div>
+    <div class="stat"><b id="nLeft">0</b><span>남은 일</span></div>
   </section>
+  <div class="bar" aria-hidden="true"><i id="fill"></i></div>
 
-  <hr class="divider">
+  <form id="form">
+    <input type="text" id="input" placeholder="할 일을 입력하세요" maxlength="100" required aria-label="할 일 입력">
+    <select id="cat" aria-label="카테고리">
+      <option value="study">학업</option>
+      <option value="life">일상</option>
+    </select>
+    <button class="primary" type="submit">추가</button>
+  </form>
 
-  <section>
-    <div class="search-form" id="searchForm">
-      <input type="text" name="q" id="searchInput" placeholder="검색어를 입력하세요" autocomplete="off">
-      <button type="button" class="search-btn" id="searchBtn" aria-label="검색">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </button>
-    </div>
-  </section>
+  <div class="tabs" role="group" aria-label="목록 필터">
+    <button class="tab" data-f="all" aria-pressed="true">전체</button>
+    <button class="tab" data-f="todo" aria-pressed="false">진행</button>
+    <button class="tab" data-f="done" aria-pressed="false">완료</button>
+    <span class="gap"></span>
+    <button class="tab" data-c="all" aria-pressed="true">모든 분류</button>
+    <button class="tab" data-c="study" aria-pressed="false">학업</button>
+    <button class="tab" data-c="life" aria-pressed="false">일상</button>
+  </div>
 
-  <hr class="divider">
+  <ul id="list"></ul>
 
-  <section>
-    <p class="todo-heading">오늘의 할 일</p>
-    <div class="todo-add" id="todoForm">
-      <input type="text" id="todoInput" placeholder="할 일을 입력하세요" autocomplete="off">
-      <button type="button" id="todoAddBtn">추가</button>
-    </div>
-    <ul class="todo-list" id="todoList"></ul>
-  </section>
-
+  <div class="foot">
+    <button id="clearDone">이 날짜의 완료 항목 지우기</button>
+    <button id="save">HTML 문서로 저장</button>
+  </div>
 </main>
 
 <script>
-  // ---- 시계 & 날짜 ----
-  const clockEl = document.getElementById('clock');
-  const dateEl = document.getElementById('date');
-  const weekdays = ['일','월','화','수','목','금','토'];
+(function(){
+  var KEY = 'todayTodos.v1';
+  var mem = null;
+  var todos = load();
+  var state = { date: ymd(new Date()), f: 'all', c: 'all', editing: null };
 
-  function updateClock(){
-    const now = new Date();
-    const hh = String(now.getHours()).padStart(2,'0');
-    const mm = String(now.getMinutes()).padStart(2,'0');
-    const ss = String(now.getSeconds()).padStart(2,'0');
-    clockEl.textContent = `${hh}:${mm}:${ss}`;
-
-    const y = now.getFullYear();
-    const m = now.getMonth()+1;
-    const d = now.getDate();
-    const w = weekdays[now.getDay()];
-    dateEl.textContent = `${y}년 ${m}월 ${d}일 ${w}요일`;
+  function load(){
+    try { var r = localStorage.getItem(KEY); return r ? JSON.parse(r) : []; }
+    catch(e){ return mem || []; }
   }
-  updateClock();
-  setInterval(updateClock, 1000);
-
-  // ---- 검색 (같은 탭에서 이동, 팝업 차단 환경에서도 동작) ----
-  const searchInput = document.getElementById('searchInput');
-  const searchBtn = document.getElementById('searchBtn');
-
-  function doSearch(){
-    const q = searchInput.value.trim();
-    if(!q) return;
-    window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(q);
+  function persist(){
+    try { localStorage.setItem(KEY, JSON.stringify(todos)); }
+    catch(e){ mem = todos; }
   }
-
-  searchBtn.addEventListener('click', doSearch);
-  searchInput.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter'){
-      e.preventDefault();
-      doSearch();
-    }
-  });
-
-  // ---- 할 일 목록 (localStorage 저장, 접근 불가 환경에서도 항상 동작) ----
-  const STORAGE_KEY = 'my-start-page-todos';
-  const todoInput = document.getElementById('todoInput');
-  const todoAddBtn = document.getElementById('todoAddBtn');
-  const todoList = document.getElementById('todoList');
-
-  let memoryTodos = []; // localStorage를 쓸 수 없는 환경을 위한 대체 저장소
-
-  function loadTodos(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    }catch(e){
-      return memoryTodos;
-    }
+  function ymd(d){
+    var m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+    return d.getFullYear()+'-'+m+'-'+day;
   }
+  function parse(s){ var p = s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+  function shift(n){ var d = parse(state.date); d.setDate(d.getDate()+n); setDate(ymd(d)); }
+  function setDate(s){ if(!s) return; state.date = s; state.editing = null; render(); }
+  function esc(s){ return s.replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  var CAT = { study:'학업', life:'일상' };
+  var $ = function(id){ return document.getElementById(id); };
 
-  function saveTodos(list){
-    memoryTodos = list;
-    try{
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    }catch(e){
-      // localStorage를 쓸 수 없는 환경(예: 미리보기 창)에서는
-      // 메모리에만 저장되며, 새로고침 시 초기화될 수 있어요.
-    }
-  }
+  function render(){
+    var day = todos.filter(function(t){ return t.date === state.date; });
+    var done = day.filter(function(t){ return t.done; }).length;
+    $('nTotal').textContent = day.length;
+    $('nDone').textContent = done;
+    $('nLeft').textContent = day.length - done;
+    $('fill').style.width = day.length ? Math.round(done/day.length*100)+'%' : '0';
+    $('date').value = state.date;
+    var d = parse(state.date);
+    var isToday = state.date === ymd(new Date());
+    $('sub').textContent = d.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'long'}) + (isToday ? ' · 오늘' : '');
 
-  let todos = loadTodos();
+    document.querySelectorAll('[data-f]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.f === state.f); });
+    document.querySelectorAll('[data-c]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.c === state.c); });
 
-  function renderTodos(){
-    todoList.innerHTML = '';
-
-    if(todos.length === 0){
-      const empty = document.createElement('li');
-      empty.className = 'todo-empty';
-      empty.textContent = '아직 할 일이 없어요. 위에 입력해 추가해보세요.';
-      todoList.appendChild(empty);
+    var shown = day.filter(function(t){
+      return (state.f === 'all' || (state.f === 'done') === t.done) && (state.c === 'all' || t.cat === state.c);
+    });
+    var ul = $('list');
+    if(!shown.length){
+      var msg = day.length ? '조건에 맞는 할 일이 없어요.' : '이 날짜에 등록된 할 일이 없어요. 위에서 첫 할 일을 추가해 보세요.';
+      ul.innerHTML = '<li class="empty" style="display:block;border-left-width:1px">'+msg+'</li>';
       return;
     }
-
-    todos.forEach((todo, index) => {
-      const li = document.createElement('li');
-      li.className = 'todo-item';
-
-      const check = document.createElement('button');
-      check.type = 'button';
-      check.className = 'todo-check' + (todo.done ? ' checked' : '');
-      check.setAttribute('aria-label', todo.done ? '완료 취소' : '완료로 표시');
-      check.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-      check.addEventListener('click', () => {
-        todos[index].done = !todos[index].done;
-        saveTodos(todos);
-        renderTodos();
-      });
-
-      const text = document.createElement('span');
-      text.className = 'todo-text' + (todo.done ? ' done' : '');
-      text.textContent = todo.text;
-
-      const remove = document.createElement('button');
-      remove.type = 'button';
-      remove.className = 'todo-remove';
-      remove.setAttribute('aria-label', '삭제');
-      remove.textContent = '✕';
-      remove.addEventListener('click', () => {
-        todos.splice(index, 1);
-        saveTodos(todos);
-        renderTodos();
-      });
-
-      li.appendChild(check);
-      li.appendChild(text);
-      li.appendChild(remove);
-      todoList.appendChild(li);
-    });
+    ul.innerHTML = shown.map(function(t){
+      if(state.editing === t.id){
+        return '<li class="'+t.cat+'"><div class="edit">'+
+          '<input type="text" id="editText" value="'+esc(t.text)+'" maxlength="100" aria-label="할 일 수정">'+
+          '<select id="editCat"><option value="study"'+(t.cat==='study'?' selected':'')+'>학업</option><option value="life"'+(t.cat==='life'?' selected':'')+'>일상</option></select>'+
+          '<button class="primary" data-a="saveEdit" data-id="'+t.id+'">저장</button>'+
+          '<button class="icon-btn" data-a="cancel">취소</button></div></li>';
+      }
+      return '<li class="'+t.cat+(t.done?' done':'')+'">'+
+        '<input type="checkbox" data-a="toggle" data-id="'+t.id+'"'+(t.done?' checked':'')+' aria-label="완료 체크">'+
+        '<div class="txt">'+esc(t.text)+'<span class="chip">'+CAT[t.cat]+'</span></div>'+
+        '<div class="acts"><button data-a="edit" data-id="'+t.id+'">수정</button><button class="del" data-a="del" data-id="'+t.id+'">삭제</button></div></li>';
+    }).join('');
+    var ed = $('editText'); if(ed){ ed.focus(); ed.setSelectionRange(ed.value.length, ed.value.length); }
   }
 
-  function addTodo(){
-    const value = todoInput.value.trim();
-    if(!value) return;
-    todos.push({ text: value, done: false });
-    saveTodos(todos);
-    todoInput.value = '';
-    renderTodos();
-    todoInput.focus();
-  }
-
-  todoAddBtn.addEventListener('click', addTodo);
-  todoInput.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter'){
-      e.preventDefault();
-      addTodo();
-    }
+  $('form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var text = $('input').value.trim();
+    if(!text) return;
+    todos.push({ id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), text: text, cat: $('cat').value, done: false, date: state.date });
+    persist(); $('input').value = ''; $('input').focus(); render();
   });
 
-  renderTodos();
-</script>
+  $('list').addEventListener('click', function(e){
+    var b = e.target.closest('[data-a]'); if(!b) return;
+    var id = b.dataset.id, a = b.dataset.a;
+    var t = todos.filter(function(x){ return x.id === id; })[0];
+    if(a === 'toggle'){ t.done = b.checked; persist(); render(); }
+    else if(a === 'del'){ todos = todos.filter(function(x){ return x.id !== id; }); persist(); render(); }
+    else if(a === 'edit'){ state.editing = id; render(); }
+    else if(a === 'cancel'){ state.editing = null; render(); }
+    else if(a === 'saveEdit'){ saveEdit(t); }
+  });
+  $('list').addEventListener('keydown', function(e){
+    if(e.target.id !== 'editText') return;
+    if(e.key === 'Enter'){ e.preventDefault(); saveEdit(todos.filter(function(x){ return x.id === state.editing; })[0]); }
+    if(e.key === 'Escape'){ state.editing = null; render(); }
+  });
+  function saveEdit(t){
+    var v = $('editText').value.trim();
+    if(v){ t.text = v; t.cat = $('editCat').value; persist(); }
+    state.editing = null; render();
+  }
 
+  document.querySelectorAll('[data-f]').forEach(function(b){ b.addEventListener('click', function(){ state.f = b.dataset.f; render(); }); });
+  document.querySelectorAll('[data-c]').forEach(function(b){ b.addEventListener('click', function(){ state.c = b.dataset.c; render(); }); });
+  $('prev').addEventListener('click', function(){ shift(-1); });
+  $('next').addEventListener('click', function(){ shift(1); });
+  $('today').addEventListener('click', function(){ setDate(ymd(new Date())); });
+  $('date').addEventListener('change', function(e){ setDate(e.target.value); });
+  $('clearDone').addEventListener('click', function(){
+    todos = todos.filter(function(t){ return !(t.date === state.date && t.done); }); persist(); render();
+  });
+
+  // 현재 문서를 하나의 HTML 파일로 저장 (할 일 데이터 포함)
+  $('save').addEventListener('click', function(){
+    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    var data = JSON.stringify(todos).replace(/</g,'\\u003c');
+    html = html.replace("var todos = load();", "var todos = load(); if(!todos.length){ todos = " + data.replace(/\$/g,'$$$$') + "; }");
+    var blob = new Blob([html], { type: 'text/html' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'index.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  });
+
+  render();
+})();
+</script>
 </body>
 </html>

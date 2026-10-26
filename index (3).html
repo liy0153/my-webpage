@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="공주대학교 문헌정보교육과 이인영의 개인 홈페이지">
+  <title>이인영 | 개인 홈페이지</title>
+  <style>
+    :root {
+      --ink: #26332f;
+      --muted: #687670;
+      --accent: #477b68;
+      --accent-dark: #315b4c;
+      --paper: #fbfaf6;
+      --card: #ffffff;
+      --soft: #eaf1eb;
+      --line: #e1e7e1;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.7;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1040px, calc(100% - 40px)); margin: 0 auto; }
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 24px 0; gap: 20px;
+    }
+    .brand { font-weight: 800; letter-spacing: -0.04em; }
+    nav { display: flex; gap: 22px; flex-wrap: wrap; }
+    nav a { color: var(--muted); text-decoration: none; font-size: .94rem; }
+    nav a:hover { color: var(--accent-dark); }
+    .hero {
+      padding: clamp(48px, 9vw, 100px) 0 72px;
+      display: grid; grid-template-columns: 1.4fr .8fr; gap: 44px; align-items: center;
+    }
+    .eyebrow { color: var(--accent); font-size: .82rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    h1 { margin: 12px 0 18px; font-size: clamp(2.8rem, 7vw, 5.4rem); line-height: 1.08; letter-spacing: -.075em; }
+    .hero p { max-width: 570px; color: var(--muted); font-size: 1.1rem; margin: 0; }
+    .hero-card {
+      background: var(--soft); border-radius: 28px; min-height: 270px; padding: 28px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      border: 1px solid #dce8de;
+    }
+    .hero-card .symbol { font-size: 4rem; line-height: 1; }
+    .hero-card strong { display: block; font-size: 1.2rem; margin-bottom: 5px; }
+    .hero-card span { color: var(--muted); font-size: .94rem; }
+    section { padding: 34px 0 58px; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+    h2 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -.05em; }
+    .section-note { margin: 0; color: var(--muted); font-size: .92rem; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+      padding: 25px; box-shadow: 0 8px 24px rgba(38, 51, 47, .035);
+    }
+    .card h3 { margin: 0 0 8px; font-size: 1.12rem; }
+    .card p { margin: 0; color: var(--muted); }
+    .tags { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 17px; }
+    .tag { background: var(--soft); color: var(--accent-dark); padding: 7px 13px; border-radius: 999px; font-size: .92rem; font-weight: 650; }
+    .activity-icon { font-size: 1.6rem; margin-bottom: 10px; }
+    .project { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+    .project p { margin-top: 5px; }
+    .project-link {
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+      padding: 10px 15px; border-radius: 999px; background: var(--accent); color: white;
+      text-decoration: none; font-size: .92rem; font-weight: 700;
+    }
+    .project-link:hover { background: var(--accent-dark); }
+    .contact {
+      background: #263b33; color: #fff; border-radius: 26px; padding: clamp(26px, 5vw, 44px);
+      display: flex; justify-content: space-between; align-items: center; gap: 22px;
+    }
+    .contact p { color: #d4e0d8; margin: 8px 0 0; }
+    .email {
+      color: #263b33; background: #fff; text-decoration: none; border-radius: 999px;
+      padding: 12px 17px; font-weight: 750; white-space: nowrap;
+    }
+    footer { padding: 28px 0 34px; color: var(--muted); font-size: .85rem; text-align: center; }
+    @media (max-width: 700px) {
+      .wrap { width: min(100% - 28px, 1040px); }
+      header { align-items: flex-start; flex-direction: column; }
+      nav { gap: 15px; }
+      .hero { grid-template-columns: 1fr; padding-top: 48px; gap: 28px; }
+      .hero-card { min-height: 205px; }
+      .grid { grid-template-columns: 1fr; }
+      .section-head { align-items: flex-start; flex-direction: column; }
+      .project, .contact { align-items: flex-start; flex-direction: column; }
+      .email { white-space: normal; overflow-wrap: anywhere; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="#home" style="text-decoration:none;">LY · PERSONAL PAGE</a>
+      <nav aria-label="주요 메뉴">
+        <a href="#about">소개</a>
+        <a href="#interests">관심사</a>
+        <a href="#activities">주요 활동</a>
+        <a href="#projects">프로젝트</a>
+        <a href="#contact">연락처</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="home">
+        <div>
+          <div class="eyebrow">Hello, nice to meet you</div>
+          <h1>안녕하세요,<br>이인영입니다.</h1>
+          <p>공주대 문헌정보교육과 25학번 이인영입니다.<br>관심 있는 것들을 즐기고, 학교생활 속 다양한 활동을 경험하고 있습니다.</p>
+        </div>
+        <aside class="hero-card" aria-label="개인 소개 요약">
+          <div class="symbol" aria-hidden="true">✳</div>
+          <div>
+            <strong>작은 관심을 즐거운 경험으로</strong>
+            <span>드라마 · 요리 · 학과 생활 · CCC</span>
+          </div>
+        </aside>
+      </section>
+
+      <section id="about">
+        <div class="section-head">
+          <h2>About me</h2>
+          <p class="section-note">저를 간단히 소개합니다.</p>
+        </div>
+        <div class="card">
+          <h3>이인영</h3>
+          <p>공주대학교 문헌정보교육과 25학번</p>
+          <div class="tags">
+            <span class="tag">대학생</span>
+            <span class="tag">문헌정보교육</span>
+            <span class="tag">새로운 경험</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="interests">
+        <div class="section-head">
+          <h2>My interests</h2>
+          <p class="section-note">일상에서 좋아하는 것들</p>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <div class="activity-icon" aria-hidden="true">🎬</div>
+            <h3>드라마</h3>
+            <p>다양한 이야기를 만나며 쉬어 가는 시간을 좋아합니다.</p>
+          </article>
+          <article class="card">
+            <div class="activity-icon" aria-hidden="true">🍳</div>
+            <h3>요리</h3>
+            <p>음식을 만들고 새로운 메뉴를 알아 가는 데 관심이 있습니다.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="activities">
+        <div class="section-head">
+          <h2>Activities</h2>
+          <p class="section-note">학교생활 속 주요 활동</p>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <div class="activity-icon" aria-hidden="true">📚</div>
+            <h3>학과 근로</h3>
+            <p>학과 근로 활동을 통해 맡은 일을 수행하고 학교생활에 참여하고 있습니다.</p>
+          </article>
+          <article class="card">
+            <div class="activity-icon" aria-hidden="true">🌱</div>
+            <h3>CCC 동아리 활동</h3>
+            <p>동아리 활동을 통해 사람들과 교류하고 함께하는 경험을 쌓고 있습니다.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="projects">
+        <div class="section-head">
+          <h2>Projects</h2>
+          <p class="section-note">직접 수행한 프로젝트</p>
+        </div>
+        <article class="card project">
+          <div>
+            <h3>오늘의 할 일 관리</h3>
+            <p>하루의 할 일을 정리하고 관리하는 개인 프로젝트입니다.</p>
+          </div>
+          <!-- 아래 href를 웹에 공개된 프로젝트 URL로 바꾸면 방문자가 열 수 있습니다. -->
+          <a class="project-link" href="file:///C:/Users/user/Downloads/index%20(2).html" target="_blank" rel="noopener noreferrer">프로젝트 보기 ↗</a>
+        </article>
+        <p class="section-note" style="margin-top:12px;">참고: file:/// 로 시작하는 주소는 본인 컴퓨터에서만 열릴 수 있습니다. 다른 방문자도 볼 수 있도록 하려면 프로젝트 파일을 웹에 게시한 뒤 공개 URL로 바꿔 주세요.</p>
+      </section>
+
+      <section id="contact">
+        <div class="contact">
+          <div>
+            <h2>Let's connect</h2>
+            <p>문의나 이야기를 나누고 싶다면 이메일로 연락해 주세요.</p>
+          </div>
+          <a class="email" href="mailto:dlsdud0153@naver.com">dlsdud0153@naver.com ↗</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>© 2026 이인영 · Personal Homepage</footer>
+  </div>
+</body>
+</html>
