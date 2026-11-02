@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>디지털 리터러시 자기평가 레이더 차트</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 32px 18px;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+      color: #243044;
+      background: #f4f7fb;
+    }
+    .container {
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 28px;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 28px rgba(30, 50, 80, .08);
+    }
+    h1 { margin: 0 0 8px; font-size: 27px; }
+    .description { margin: 0 0 26px; color: #64748b; line-height: 1.6; }
+    h2 { font-size: 19px; margin: 26px 0 14px; }
+    .legend { display: flex; gap: 20px; margin: 0 0 12px; flex-wrap: wrap; }
+    .legend span { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .blue { background: #2878d0; }
+    .red { background: #e34b4b; }
+    .chart-wrap { display: flex; justify-content: center; align-items: center; width: 100%; }
+    canvas { display: block; width: min(100%, 650px); height: auto; }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; min-width: 470px; }
+    th, td { padding: 12px 10px; text-align: center; border-bottom: 1px solid #e7edf4; }
+    th { background: #f7f9fc; font-weight: 700; }
+    td:first-child, th:first-child { text-align: left; }
+    input[type="number"] {
+      width: 82px; padding: 8px; border: 1px solid #cbd5e1;
+      border-radius: 7px; font-size: 15px; text-align: center;
+    }
+    input:focus { outline: 2px solid #9bc5f2; border-color: #2878d0; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    button {
+      border: 0; border-radius: 8px; padding: 11px 16px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      background: #2878d0; color: white;
+    }
+    button.secondary { background: #64748b; }
+    button:hover { filter: brightness(.95); }
+    #message { min-height: 22px; color: #c2410c; font-size: 13px; margin-top: 8px; }
+    .summary {
+      padding: 18px; background: #f7f9fc; border-radius: 12px;
+      line-height: 1.8; white-space: pre-line;
+    }
+    .note { color: #64748b; font-size: 13px; line-height: 1.6; margin-top: 12px; }
+    @media (max-width: 600px) {
+      body { padding: 14px 8px; }
+      .container { padding: 18px 13px; }
+      h1 { font-size: 22px; }
+      input[type="number"] { width: 68px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>디지털 리터러시 자기평가</h1>
+      <p class="description">사전평가와 사후평가 점수를 비교하여 디지털 리터러시 역량의 변화를 확인합니다.</p>
+    </header>
+
+    <section aria-labelledby="chart-title">
+      <h2 id="chart-title">평가 결과 레이더 차트</h2>
+      <div class="legend" aria-label="차트 범례">
+        <span><i class="dot blue"></i> 사전평가</span>
+        <span><i class="dot red"></i> 사후평가</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="radarChart" width="700" height="620" role="img"
+          aria-label="디지털 리터러시 다섯 영역의 사전평가와 사후평가 점수를 비교한 레이더 차트"></canvas>
+      </div>
+    </section>
+
+    <section aria-labelledby="input-title">
+      <h2 id="input-title">영역별 점수 입력 및 수정</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>평가 영역</th><th>사전평가 (0~100)</th><th>사후평가 (0~100)</th></tr>
+          </thead>
+          <tbody id="scoreRows"></tbody>
+        </table>
+      </div>
+      <div id="message" role="status" aria-live="polite"></div>
+      <div class="actions">
+        <button type="button" id="resetBtn" class="secondary">초기화</button>
+        <button type="button" id="saveBtn">차트 이미지 저장 (PNG)</button>
+      </div>
+      <p class="note">점수는 0~100 사이의 정수로 입력할 수 있습니다. 한 영역이라도 두 평가 점수가 모두 입력되지 않으면 해당 영역은 차트에서 제외됩니다. 레이더 차트에는 최소 3개 영역이 필요합니다.</p>
+    </section>
+
+    <section aria-labelledby="summary-title">
+      <h2 id="summary-title">평가 결과 분석 요약</h2>
+      <div id="summary" class="summary" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script>
+    const initialData = [
+      { name: "정보검색 능력", before: 45, after: 78 },
+      { name: "비판적 사고", before: 38, after: 71 },
+      { name: "디지털 도구 활용", before: 52, after: 85 },
+      { name: "협업 능력", before: 60, after: 80 },
+      { name: "창의적 문제해결", before: 41, after: 75 }
+    ];
+
+    let data = initialData.map(item => ({ ...item }));
+    const canvas = document.getElementById("radarChart");
+    const ctx = canvas.getContext("2d");
+    const rows = document.getElementById("scoreRows");
+    const message = document.getElementById("message");
+    const summary = document.getElementById("summary");
+
+    function renderInputs() {
+      rows.innerHTML = "";
+      data.forEach((item, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${item.name}</td>
+          <td><input type="number" min="0" max="100" step="1" inputmode="numeric"
+              aria-label="${item.name} 사전평가 점수" data-index="${index}" data-type="before"></td>
+          <td><input type="number" min="0" max="100" step="1" inputmode="numeric"
+              aria-label="${item.name} 사후평가 점수" data-index="${index}" data-type="after"></td>`;
+        rows.appendChild(tr);
+        tr.querySelectorAll("input").forEach(input => {
+          const type = input.dataset.type;
+          input.value = item[type] ?? "";
+          input.addEventListener("input", () => {
+            const value = input.value.trim();
+            if (value === "") {
+              data[index][type] = null;
+            } else {
+              const number = Number(value);
+              if (!Number.isInteger(number) || number < 0 || number > 100) {
+                message.textContent = "점수는 0부터 100까지의 정수로 입력해 주세요.";
+                draw();
+                return;
+              }
+              data[index][type] = number;
+            }
+            message.textContent = "";
+            draw();
+          });
+        });
+      });
+    }
+
+    function getValidData() {
+      return data.filter(item =>
+        Number.isInteger(item.before) && item.before >= 0 && item.before <= 100 &&
+        Number.isInteger(item.after) && item.after >= 0 && item.after <= 100
+      );
+    }
+
+    function draw() {
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      const cx = w / 2, cy = h / 2 + 8;
+      const radius = 205;
+      const valid = getValidData();
+
+      ctx.font = "14px Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      // 동심원 및 점수 눈금
+      for (let level = 1; level <= 5; level++) {
+        const r = radius * level / 5;
+        ctx.beginPath();
+        valid.forEach((_, i) => {
+          const angle = -Math.PI / 2 + (2 * Math.PI * i / valid.length);
+          const x = cx + r * Math.cos(angle);
+          const y = cy + r * Math.sin(angle);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        if (valid.length >= 3) {
+          ctx.closePath();
+          ctx.strokeStyle = "#dce4ee";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+        ctx.fillStyle = "#7b8798";
+        ctx.textAlign = "left";
+        ctx.fillText(String(level * 20), cx + 5, cy - r + 2);
+      }
+
+      if (valid.length < 3) {
+        ctx.fillStyle = "#64748b";
+        ctx.textAlign = "center";
+        ctx.font = "17px Arial, sans-serif";
+        ctx.fillText("차트를 표시하려면 사전·사후 점수가 모두 입력된", cx, cy - 12);
+        ctx.fillText("영역이 최소 3개 필요합니다.", cx, cy + 16);
+        updateSummary(valid);
+        return;
+      }
+
+      // 축과 영역명
+      valid.forEach((item, i) => {
+        const angle = -Math.PI / 2 + (2 * Math.PI * i / valid.length);
+        const x = cx + radius * Math.cos(angle);
+        const y = cy + radius * Math.sin(angle);
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = "#cbd5e1";
+        ctx.stroke();
+
+        const labelX = cx + (radius + 42) * Math.cos(angle);
+        const labelY = cy + (radius + 42) * Math.sin(angle);
+        ctx.fillStyle = "#243044";
+        ctx.font = "bold 14px Arial, sans-serif";
+        ctx.textAlign = labelX < cx - 10 ? "right" : labelX > cx + 10 ? "left" : "center";
+        ctx.fillText(item.name, labelX, labelY);
+      });
+
+      function drawSeries(key, color, fill) {
+        ctx.beginPath();
+        valid.forEach((item, i) => {
+          const angle = -Math.PI / 2 + (2 * Math.PI * i / valid.length);
+          const r = radius * item[key] / 100;
+          const x = cx + r * Math.cos(angle);
+          const y = cy + r * Math.sin(angle);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.fill();
+        ctx.stroke();
+
+        valid.forEach((item, i) => {
+          const angle = -Math.PI / 2 + (2 * Math.PI * i / valid.length);
+          const r = radius * item[key] / 100;
+          const x = cx + r * Math.cos(angle);
+          const y = cy + r * Math.sin(angle);
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.fillStyle = "#243044";
+          ctx.font = "bold 12px Arial, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(item[key], x, y - 12);
+        });
+      }
+
+      drawSeries("before", "#2878d0", "rgba(40,120,208,0.16)");
+      drawSeries("after", "#e34b4b", "rgba(227,75,75,0.16)");
+      updateSummary(valid);
+    }
+
+    function updateSummary(valid) {
+      if (valid.length === 0) {
+        summary.textContent = "입력된 평가 영역이 없습니다. 사전평가와 사후평가 점수를 입력해 주세요.";
+        return;
+      }
+      if (valid.length < 3) {
+        summary.textContent = `현재 ${valid.length}개 영역의 점수가 완성되었습니다. 레이더 차트와 분석을 보려면 최소 3개 영역의 사전·사후 점수가 모두 필요합니다.`;
+        return;
+      }
+      const improvements = valid.map(item => ({
+        name: item.name, difference: item.after - item.before
+      }));
+      const averageBefore = valid.reduce((sum, item) => sum + item.before, 0) / valid.length;
+      const averageAfter = valid.reduce((sum, item) => sum + item.after, 0) / valid.length;
+      const highest = improvements.reduce((a, b) => b.difference > a.difference ? b : a);
+      const lowest = improvements.reduce((a, b) => b.difference < a.difference ? b : a);
+      const lines = [
+        `분석 대상: ${valid.length}개 영역`,
+        `사전평가 평균: ${averageBefore.toFixed(1)}점`,
+        `사후평가 평균: ${averageAfter.toFixed(1)}점`,
+        `전체 평균 변화: ${(averageAfter - averageBefore) >= 0 ? "+" : ""}${(averageAfter - averageBefore).toFixed(1)}점`,
+        `가장 많이 향상된 영역: ${highest.name} (${highest.difference >= 0 ? "+" : ""}${highest.difference}점)`,
+        `향상 폭이 가장 작은 영역: ${lowest.name} (${lowest.difference >= 0 ? "+" : ""}${lowest.difference}점)`
+      ];
+      summary.textContent = lines.join("\n");
+    }
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      data = initialData.map(item => ({ ...item }));
+      message.textContent = "처음 제공된 점수로 초기화했습니다.";
+      renderInputs();
+      draw();
+    });
+
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      if (getValidData().length < 3) {
+        message.textContent = "이미지를 저장하려면 최소 3개 영역의 사전·사후 점수가 필요합니다.";
+        return;
+      }
+      const link = document.createElement("a");
+      link.download = "digital-literacy-radar-chart.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      message.textContent = "차트 이미지를 PNG 파일로 저장했습니다.";
+    });
+
+    renderInputs();
+    draw();
+  </script>
+</body>
+</html>
