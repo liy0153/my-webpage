@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KDC 주류 짝맞추기 카드 게임</title>
+<style>
+:root{
+  --paper:#f6efe0; --ink:#2b2a33; --wood:#7a4e2d; --label:#fffaf0; --navy:#27406b;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;user-select:none;-webkit-tap-highlight-color:transparent}
+body{background:repeating-linear-gradient(0deg,#e9dcc0 0 2px,#f1e6cd 2px 36px);min-height:100vh;display:flex;justify-content:center;padding:16px}
+.container{max-width:640px;width:100%;display:flex;flex-direction:column;align-items:center;gap:12px}
+
+.intro{width:100%;background:var(--navy);color:#fff;border-radius:14px;padding:16px 20px;text-align:center;box-shadow:0 6px 0 #16294a}
+.intro h1{font-size:1.45rem;margin-bottom:4px;letter-spacing:-.02em}
+.intro p{font-size:.9rem;line-height:1.5;color:#dbe5f7}
+
+.dashboard{width:100%;background:var(--label);border:2px solid var(--wood);border-radius:14px;padding:10px 18px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.stat{display:flex;flex-direction:column;align-items:center}
+.stat span:first-child{font-size:.75rem;color:#8a7a62;font-weight:700}
+.stat span:last-child{font-size:1.25rem;font-weight:800;color:var(--ink)}
+.btn{background:#d9534f;color:#fff;border:none;padding:9px 16px;font-size:.95rem;font-weight:800;border-radius:10px;cursor:pointer;box-shadow:0 4px 0 #a23b38;transition:transform .1s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a23b38}
+.btn.sub{background:var(--navy);box-shadow:0 4px 0 #16294a}
+
+.toast{width:100%;min-height:52px;background:#fff;border-left:8px solid #bbb;border-radius:10px;padding:8px 14px;font-size:.9rem;line-height:1.45;color:var(--ink);display:flex;align-items:center;transition:border-color .3s}
+.toast b{font-size:1rem}
+
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;perspective:1000px}
+.card{aspect-ratio:1/1.1;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.175,.885,.32,1.275);cursor:pointer}
+.card.flipped,.card.matched{transform:rotateY(180deg)}
+.card.matched{cursor:default}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:6px;box-shadow:0 3px 8px rgba(0,0,0,.22)}
+.front{background:var(--navy);border:3px solid #e4d3a8;color:#e4d3a8}
+.front::before{content:"KDC";font-size:.95rem;font-weight:900;letter-spacing:.12em}
+.front::after{content:"";width:60%;height:2px;background:#e4d3a8;margin-top:6px;box-shadow:0 5px 0 #e4d3a8,0 10px 0 #e4d3a8}
+.back{transform:rotateY(180deg);background:var(--label);border:3px solid #cdbb94;color:var(--ink)}
+.back .num{font-size:clamp(1.8rem,7vw,2.8rem);font-weight:900;line-height:1;letter-spacing:-.03em}
+.back .name{font-size:clamp(.95rem,4vw,1.3rem);font-weight:800;margin-top:6px;word-break:keep-all}
+.back .emoji{font-size:clamp(1.4rem,5vw,2rem);line-height:1}
+.back .keys{font-size:clamp(.62rem,2.6vw,.8rem);line-height:1.35;margin-top:5px;font-weight:600;word-break:keep-all}
+.back.type-desc{background:#fff6d6;border-color:#e3c35a}
+.card.matched .back{border-color:var(--c);background:var(--c-bg);box-shadow:0 0 0 3px var(--c) inset}
+
+details{width:100%;background:var(--label);border:2px solid var(--wood);border-radius:12px;padding:10px 14px}
+summary{cursor:pointer;font-weight:800;color:var(--navy)}
+.ref{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:10px;font-size:.85rem;line-height:1.4}
+.ref div{border-left:6px solid var(--c);padding-left:8px}
+
+#confetti{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:99}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);justify-content:center;align-items:center;z-index:100}
+.modal.active{display:flex;animation:fade .3s}
+.modal-box{background:var(--label);padding:26px;border-radius:20px;text-align:center;max-width:400px;width:90%;border:4px solid var(--navy);animation:pop .4s cubic-bezier(.175,.885,.32,1.275)}
+.modal-box h2{color:var(--navy);font-size:1.6rem;margin-bottom:8px}
+.modal-box p{color:#555;font-size:1.05rem;line-height:1.6;margin-bottom:18px}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+
+@media (max-width:560px){
+  body{padding:10px}
+  .grid{gap:7px}
+  .card{aspect-ratio:1/1.15}
+  .intro h1{font-size:1.2rem}.intro p{font-size:.8rem}
+  .dashboard{padding:8px 10px}
+  .btn{padding:8px 11px;font-size:.85rem}
+  .ref{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="container">
+  <div class="intro">
+    <h1>📚 KDC 주류 짝맞추기</h1>
+    <p>도서관 책은 어떻게 정리될까요? <b>번호 카드</b>와 알맞은 <b>주류 이름 카드</b>를 찾아<br>한국십진분류법(KDC)의 10개 주류를 외워 보세요!</p>
+  </div>
+
+  <div class="dashboard">
+    <div class="stat"><span>점수</span><span id="score">0</span></div>
+    <div class="stat"><span>시도</span><span id="attempts">0</span></div>
+    <div class="stat"><span>맞춘 짝</span><span id="matches">0 / 10</span></div>
+    <button class="btn" onclick="initGame()">다시 시작</button>
+  </div>
+
+  <div class="toast" id="toast">카드 두 장을 뒤집어 <b>&nbsp;번호 카드 + 주류 이름 카드&nbsp;</b>를 맞춰보세요!</div>
+
+  <div class="grid" id="grid"></div>
+
+  <details>
+    <summary>📖 KDC 10개 주류 미리 보기 (힌트)</summary>
+    <div class="ref" id="ref"></div>
+  </details>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h2>🎉 모두 찾았어요! 🎉</h2>
+    <p id="modal-desc"></p>
+    <button class="btn" onclick="closeModal();initGame()">다시하기</button>
+  </div>
+</div>
+
+<script>
+// KDC 10개 주류 데이터
+const KDC = [
+  {id:'000', name:'총류',     emoji:'🗂️', keys:'백과사전 · 도서관 · 신문 · 컴퓨터',   desc:'어느 한 분야로 나누기 어려운 모든 지식을 모은 분야예요. 백과사전, 도서관, 신문이 여기에 있어요.', c:'#7f8c8d', bg:'#ecf0f1'},
+  {id:'100', name:'철학',     emoji:'🤔', keys:'철학 · 윤리 · 심리학 · 논리',          desc:'"나는 누구인가?" 같은 근본적인 질문과 마음, 윤리를 다루는 분야예요.', c:'#8e44ad', bg:'#f3e5f9'},
+  {id:'200', name:'종교',     emoji:'🕊️', keys:'불교 · 기독교 · 천주교 · 신화',        desc:'여러 종교와 신화를 다루는 분야예요.', c:'#d35400', bg:'#fdebd9'},
+  {id:'300', name:'사회과학', emoji:'⚖️', keys:'법 · 경제 · 정치 · 교육',              desc:'사람들이 함께 사는 사회의 법, 경제, 정치, 교육을 다루는 분야예요.', c:'#2980b9', bg:'#dcedf9'},
+  {id:'400', name:'자연과학', emoji:'🔬', keys:'수학 · 물리 · 화학 · 생물 · 천문',     desc:'자연 현상의 원리를 연구하는 수학과 과학 분야예요.', c:'#27ae60', bg:'#dff5e8'},
+  {id:'500', name:'기술과학', emoji:'🛠️', keys:'의학 · 농업 · 공학 · 요리',            desc:'과학을 실제 생활에 활용하는 기술! 의학, 공학, 농업, 요리가 포함돼요.', c:'#c0392b', bg:'#fbe1de'},
+  {id:'600', name:'예술',     emoji:'🎨', keys:'미술 · 음악 · 영화 · 스포츠',          desc:'미술, 음악, 영화, 그리고 스포츠와 오락까지 포함하는 분야예요.', c:'#e84393', bg:'#fde3f0'},
+  {id:'700', name:'언어',     emoji:'🗣️', keys:'국어 · 영어 · 일본어 · 중국어',        desc:'말과 글, 언어의 구조와 외국어 학습을 다루는 분야예요.', c:'#16a085', bg:'#d9f4ee'},
+  {id:'800', name:'문학',     emoji:'📖', keys:'시 · 소설 · 수필 · 희곡',              desc:'시, 소설, 수필 같은 문학 작품이 모여 있어요. 소설책은 여기서 찾아요!', c:'#b7791f', bg:'#fbeccb'},
+  {id:'900', name:'역사',     emoji:'🏛️', keys:'세계사 · 한국사 · 지리 · 전기',        desc:'과거의 사건과 나라의 역사, 지리, 위인 전기를 다루는 분야예요.', c:'#5d4037', bg:'#efe3dd'}
+];
+
+// 사운드
+let audioCtx;
+function playSound(type){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    const now = audioCtx.currentTime;
+    const tone=(f,t,d,wave='sine',v=.3)=>{
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.type=wave;o.connect(g);g.connect(audioCtx.destination);
+      o.frequency.setValueAtTime(f,now+t);
+      g.gain.setValueAtTime(v,now+t);
+      g.gain.exponentialRampToValueAtTime(.01,now+t+d);
+      o.start(now+t);o.stop(now+t+d);
+    };
+    if(type==='flip') tone(600,0,.1);
+    else if(type==='match'){tone(523.25,0,.15,'triangle');tone(659.25,.1,.15,'triangle');tone(783.99,.2,.2,'triangle');}
+    else if(type==='unmatch') tone(220,0,.2,'sawtooth',.2);
+    else if(type==='win') [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f,i*.12,.3));
+  }catch(e){}
+}
+
+let flipped=[], lock=false, score=0, attempts=0, matches=0;
+const $=id=>document.getElementById(id);
+const gridEl=$('grid'), toastEl=$('toast');
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function setToast(html,color){toastEl.innerHTML=html;toastEl.style.borderColor=color||'#bbb';}
+
+function initGame(){
+  gridEl.innerHTML=''; flipped=[]; lock=false; score=attempts=matches=0;
+  $('score').textContent=0; $('attempts').textContent=0; $('matches').textContent=`0 / ${KDC.length}`;
+  setToast('카드 두 장을 뒤집어 <b>&nbsp;번호 카드 + 주류 이름 카드&nbsp;</b>를 맞춰보세요!');
+
+  const deck=[];
+  KDC.forEach(k=>{deck.push({k,type:'num'});deck.push({k,type:'desc'});});
+  shuffle(deck).forEach(({k,type})=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.dataset.id=k.id;
+    card.dataset.type=type;
+    card.style.setProperty('--c',k.c);
+    card.style.setProperty('--c-bg',k.bg);
+    const inner = type==='num'
+      ? `<div class="num">${k.id}</div>`
+      : `<div class="emoji">${k.emoji}</div><div class="name">${k.name}</div>`;
+    card.innerHTML=`<div class="face front"></div><div class="face back ${type==='desc'?'type-desc':''}">${inner}</div>`;
+    card.addEventListener('click',flipCard);
+    gridEl.appendChild(card);
+  });
+}
+
+function flipCard(){
+  if(lock||this.classList.contains('flipped')||this.classList.contains('matched'))return;
+  playSound('flip');
+  this.classList.add('flipped');
+  flipped.push(this);
+  if(flipped.length===2){
+    attempts++; $('attempts').textContent=attempts;
+    const [a,b]=flipped;
+    // 같은 주류이면서 번호 카드 + 주류 이름 카드 조합이어야 정답
+    (a.dataset.id===b.dataset.id && a.dataset.type!==b.dataset.type) ? onMatch(a,b) : onMiss(a,b);
+  }
+}
+
+function onMatch(a,b){
+  playSound('match');
+  a.classList.add('matched'); b.classList.add('matched');
+  score+=10; matches++;
+  $('score').textContent=score; $('matches').textContent=`${matches} / ${KDC.length}`;
+  const k=KDC.find(x=>x.id===a.dataset.id);
+  setToast(`✅ <b>${k.id} ${k.name}</b> — ${k.desc}`,k.c);
+  flipped=[];
+  if(matches===KDC.length) setTimeout(onWin,700);
+}
+
+function onMiss(a,b){
+  lock=true;
+  setToast('앗, 짝이 아니에요. 카드 내용을 잘 기억해 두세요! 🧠','#bbb');
+  setTimeout(()=>{
+    playSound('unmatch');
+    a.classList.remove('flipped'); b.classList.remove('flipped');
+    flipped=[]; lock=false;
+  },1300);
+}
+
+function onWin(){
+  playSound('win'); startConfetti();
+  const perfect=KDC.length;
+  const rank = attempts<=perfect+4 ? '🏆 KDC 박사!' : attempts<=perfect+12 ? '🥈 도서관 사서 수준!' : '🌱 계속 도전하면 금방 외워져요!';
+  $('modal-desc').innerHTML=`총 <b>${attempts}번</b> 시도해서 <b>${score}점</b>을 얻었어요!<br>${rank}`;
+  $('modal').classList.add('active');
+}
+function closeModal(){$('modal').classList.remove('active');}
+
+// 주류 미리 보기
+$('ref').innerHTML=KDC.map(k=>`<div style="--c:${k.c}"><b>${k.id} ${k.name}</b><br>${k.keys}</div>`).join('');
+
+// 폭죽
+const cv=$('confetti'),cx=cv.getContext('2d');let ps=[];
+function rs(){cv.width=innerWidth;cv.height=innerHeight;} addEventListener('resize',rs);rs();
+function startConfetti(){
+  ps=Array.from({length:120},()=>({x:cv.width/2,y:cv.height/2,vx:(Math.random()-.5)*14,vy:(Math.random()-.5)*14-4,
+    color:KDC[Math.floor(Math.random()*10)].c,size:Math.random()*8+4,life:100}));
+  (function loop(){
+    cx.clearRect(0,0,cv.width,cv.height);
+    ps=ps.filter(p=>p.life>0);
+    ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.15;p.life-=1.5;cx.fillStyle=p.color;cx.beginPath();cx.arc(p.x,p.y,p.size,0,6.283);cx.fill();});
+    if(ps.length)requestAnimationFrame(loop);
+  })();
+}
+
+initGame();
+</script>
+</body>
+</html>
