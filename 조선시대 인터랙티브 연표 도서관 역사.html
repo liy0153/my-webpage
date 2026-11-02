@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>조선시대 인터랙티브 연표</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#eceff4;--surface:#fff;--ink:#1b2a4e;--muted:#5d6a88;--line:#9aa6c0;--seal:#b8322a;--seal-ink:#fff;--shadow:rgba(27,42,78,.14);--lib:#1f7a78;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111a2e;--surface:#1a2644;--ink:#e8ecf7;--muted:#a3aecb;--line:#4a5a82;--seal:#ef6a5e;--seal-ink:#1a0d0b;--shadow:rgba(0,0,0,.45);--lib:#5fd0c8}}
+:root[data-theme="dark"]{--bg:#111a2e;--surface:#1a2644;--ink:#e8ecf7;--muted:#a3aecb;--line:#4a5a82;--seal:#ef6a5e;--seal-ink:#1a0d0b;--shadow:rgba(0,0,0,.45);--lib:#5fd0c8}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Noto Sans KR",system-ui,sans-serif;min-height:100vh}
+header{padding:20px 20px 4px;max-width:900px;margin:0 auto}
+h1{font:700 clamp(24px,5vw,34px)/1.25 "Gowun Batang",serif;margin:0}
+header p{margin:6px 0 0;color:var(--muted);font-size:15px}
+#scroller{overflow-x:auto;position:relative;margin-top:8px;scrollbar-color:var(--line) transparent;-webkit-overflow-scrolling:touch}
+#track{position:relative;height:470px}
+#axis{position:absolute;top:235px;height:2px;background:var(--line);left:0}
+.tick{position:absolute;top:239px;font-size:11px;color:var(--muted);transform:translateX(-50%);padding-top:6px;border-left:1px solid var(--line);height:16px;line-height:1;padding-left:0}
+.tick span{position:absolute;top:8px;left:50%;transform:translateX(-50%);white-space:nowrap}
+.ev{position:absolute;top:0;width:0;height:470px}
+.stem{position:absolute;left:-1px;width:2px;background:var(--line);transition:background .3s}
+.node{position:absolute;top:226px;left:-10px;width:20px;height:20px;border-radius:50%;background:var(--surface);border:3px solid var(--ink);padding:0;cursor:pointer;transition:transform .35s cubic-bezier(.3,1.6,.5,1),background .3s,border-color .3s;z-index:2}
+.card{position:absolute;left:-62px;width:124px;text-align:center;background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;box-shadow:0 2px 8px var(--shadow);transition:transform .35s,border-color .3s,background .3s;font:inherit;color:inherit}
+.card b{display:block;font:700 18px/1.2 "Gowun Batang",serif;color:var(--muted)}
+.card small{display:block;font-size:13px;line-height:1.35;margin-top:2px;word-break:keep-all}
+.up .card{bottom:calc(276px + var(--o))}.down .card{top:calc(276px + var(--o))}
+.up .stem{top:calc(194px - var(--o));height:calc(42px + var(--o))}.down .stem{top:235px;height:calc(42px + var(--o))}
+.lib .card{border-color:var(--lib)}.lib .node{border-color:var(--lib)}.lib .card b::after{content:" 📚";font-size:14px}
+.chips{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.chip{font:500 14px "Noto Sans KR",sans-serif;padding:7px 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ev.on .node{transform:scale(1.5);background:var(--seal);border-color:var(--seal)}
+.ev.on .card{border-color:var(--seal);background:var(--surface);transform:scale(1.12);z-index:3}
+.ev.on .card b{color:var(--seal)}
+.ev.on .stem{background:var(--seal)}
+.node:focus-visible,.card:focus-visible,button:focus-visible{outline:3px solid var(--seal);outline-offset:2px}
+#popup{max-width:760px;margin:6px auto 0;padding:0 16px 28px}
+#pc{background:var(--surface);border:1.5px solid var(--seal);border-radius:14px;padding:18px 20px 16px;box-shadow:0 6px 22px var(--shadow);animation:pop .35s ease}
+@keyframes pop{from{transform:translateY(12px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+.yr{font:700 15px "Gowun Batang",serif;color:var(--seal)}
+#pc h2{font:700 26px/1.3 "Gowun Batang",serif;margin:2px 0 4px}
+.sum{font-weight:500;margin:0 0 10px}
+#pc p{margin:0 0 8px;word-break:keep-all}
+.why{background:var(--bg);border-radius:8px;padding:8px 12px;font-size:15px}
+.gap{color:var(--muted);font-size:14px;margin-top:8px}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px}
+button.b{font:500 15px "Noto Sans KR",sans-serif;padding:9px 16px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+button.b:disabled{opacity:.35;cursor:default}
+.cnt{color:var(--muted);font-size:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}#scroller{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header>
+<h1>조선시대 인터랙티브 연표</h1>
+<p>사건 카드를 누르면 쉬운 설명이 나와요. 사건 사이의 거리는 실제 시간 간격과 비례해요.</p>
+<div class="chips"><button class="chip" id="fa" aria-pressed="true">전체 사건</button><button class="chip" id="fl" aria-pressed="false">📚 도서관·책 이야기</button></div>
+</header>
+<div id="scroller" role="group" aria-label="가로로 스크롤되는 조선시대 연표"><div id="track"><div id="axis"></div></div></div>
+<div id="popup" aria-live="polite"><div id="pc"></div></div>
+<script>
+var E=[
+{y:1392,t:"조선 건국",s:"이성계가 새 나라를 세웠어요.",b:"고려 말에 이성계 장군은 백성의 마음을 얻었어요. 그리고 새 나라 ‘조선’을 세웠지요. 수도는 한양, 지금의 서울이에요. 조선은 500년 넘게 이어졌어요.",w:"이때부터 우리가 배우는 조선시대가 시작돼요."},
+{y:1418,t:"세종대왕 즉위",s:"백성을 아끼는 임금님이 되었어요.",b:"세종대왕은 임금이 된 뒤 백성이 잘 살 수 있도록 애썼어요. 농사짓는 법, 과학, 음악 등 여러 분야를 발전시켰어요. 훌륭한 신하들도 함께했어요.",w:"조선의 문화와 과학이 크게 꽃피는 시기가 열렸어요."},
+{y:1443,t:"한글 창제",s:"세종대왕이 우리 글자를 만들었어요.",b:"옛날에는 우리말을 적을 글자가 없어서 어려운 한자를 빌려 썼어요. 그래서 글을 배우기 힘든 백성이 많았지요. 세종대왕은 누구나 쉽게 배울 수 있는 글자를 만들었어요. 1446년에 ‘훈민정음’이라는 이름으로 널리 알렸답니다.",w:"지금 우리가 쓰는 한글이 바로 이때 만들어졌어요."},
+{y:1592,t:"임진왜란",s:"일본이 쳐들어온 큰 전쟁이에요.",b:"일본이 조선을 침략해 7년 동안 전쟁이 이어졌어요. 이순신 장군은 거북선으로 바다에서 적을 막았어요. 평범한 백성들도 의병이 되어 나라를 지켰어요.",w:"많은 사람이 힘을 모아 나라를 지킨 사건이에요."},
+{y:1636,t:"병자호란",s:"청나라가 쳐들어온 전쟁이에요.",b:"청나라 군대가 조선에 쳐들어왔어요. 인조 임금은 남한산성으로 피했지만, 추위와 식량 부족으로 오래 버티지 못하고 항복했어요.",w:"임진왜란에 이어 또 한 번 나라가 큰 어려움을 겪었어요."},
+{y:1724,t:"영조의 탕평책",s:"편을 가르지 않고 인재를 뽑았어요.",b:"신하들이 자기 편끼리만 뭉쳐 자주 다투었어요. 영조 임금은 어느 편인지 따지지 않고 능력 있는 사람을 골고루 뽑으려 했어요. 이것을 ‘탕평책’이라고 해요.",w:"‘공평하게 사람을 쓴다’는 생각을 보여 주는 정책이에요."},
+{y:1794,t:"수원 화성 축조",s:"정조가 튼튼하고 아름다운 성을 지었어요.",b:"정조 임금은 수원에 새로운 성 ‘화성’을 쌓기 시작했어요. 무거운 돌을 쉽게 드는 ‘거중기’ 같은 기계를 만들어 썼어요. 일하는 백성에게는 일한 만큼 돈도 주었어요.",w:"과학 기술과 백성을 생각하는 마음이 담긴 문화유산이에요."},
+{y:1866,t:"병인양요",s:"프랑스 군대가 강화도에 쳐들어왔어요.",b:"프랑스 군함이 강화도에 나타나 조선과 싸웠어요. 조선 군대는 끝까지 맞서 싸워 프랑스 군대를 물리쳤어요.",w:"조선이 바깥 나라들의 압박을 받던 시기를 보여 줘요."},
+{y:1894,t:"동학농민운동",s:"농민들이 억울함을 외치며 일어났어요.",b:"관리들이 세금을 너무 많이 걷어 농민들이 힘들었어요. 전봉준을 비롯한 농민들이 ‘우리도 사람답게 살게 해 달라’며 일어났어요.",w:"평범한 백성들이 세상을 바꾸려 한 큰 움직임이에요."},
+{y:1897,t:"대한제국 선포",s:"고종이 황제가 되어 나라 이름을 바꿨어요.",b:"고종 임금은 나라 이름을 ‘대한제국’으로 바꾸고 황제가 되었어요. 다른 나라에 휘둘리지 않는 힘센 나라를 만들려고 했어요.",w:"조선 시대의 마지막 모습이자, 근대 국가를 향한 도전이었어요."}];
+E=E.concat([
+{y:1420,lib:1,t:"집현전 확대",s:"학자들이 책을 모아 연구하는 곳이에요.",b:"세종대왕은 궁궐 안의 ‘집현전’을 크게 키웠어요. 이곳에서 똑똑한 학자들이 책을 모으고 읽고 연구했어요. 도서관이면서 연구소였던 셈이에요. 한글을 만들 때도 집현전 학자들이 함께했어요.",w:"책과 학문을 소중히 여기는 나라의 모습을 보여 줘요."},
+{y:1463,lib:1,t:"홍문관 설치",s:"궁궐 안 도서관이자 임금님의 조언 기관이에요.",b:"홍문관은 궁궐 안에서 책을 보관하고 관리하는 도서관이었어요. 학자들은 책을 연구하면서 임금님께 옳은 길을 조언했어요. 집현전이 문을 닫은 뒤에 그 역할을 이어받았어요.",w:"조선에서 책과 지식은 나라를 다스리는 데 꼭 필요했어요."},
+{y:1606,lib:1,t:"5대 사고 정비",s:"역사책을 다섯 곳에 나눠 지켰어요.",b:"임진왜란 때 조선왕조실록을 보관하던 곳이 대부분 불타고, 전주의 실록만 남았어요. 그래서 이 책을 다시 베껴 인쇄해 서울, 강화도, 묘향산, 태백산, 오대산 다섯 곳에 나눠 보관했어요. 이곳을 ‘사고’라고 불러요.",w:"한 곳이 불타도 다른 곳이 남도록, 기록을 지키는 지혜가 담겼어요."},
+{y:1776,lib:1,t:"규장각 설치",s:"정조가 왕실 도서관을 만들었어요.",b:"정조 임금은 임금이 된 해에 창덕궁에 ‘규장각’을 세웠어요. 왕실의 책과 중요한 문서를 모아 두고, 책을 연구하고 펴내는 곳이었어요. 신분과 상관없이 실력 있는 학자들을 뽑아 일하게 했어요.",w:"오늘날 서울대학교 규장각에서 이 책들을 지키고 있어요."},
+{y:1782,lib:1,t:"외규장각 설치",s:"강화도에 책을 따로 보관했어요.",b:"정조 임금은 강화도에 ‘외규장각’을 세웠어요. 궁궐 밖에서도 중요한 책을 안전하게 지키려는 곳이었어요. 나라의 큰 행사를 그림과 글로 기록한 ‘의궤’ 같은 책들이 보관됐어요.",w:"안전한 곳에 기록을 하나 더 두는 ‘백업’ 같은 생각이에요."}
+]).sort(function(a,b){return a.y-b.y});
+E.forEach(function(e){if(e.y===1866){e.lib=1;e.b+=" 이때 프랑스 군대가 외규장각의 귀한 책 ‘의궤’를 가져가 버렸어요. 그 책들은 오랜 노력 끝에 2011년 우리나라로 돌아왔어요."}});
+var ALL=E.slice();
+var PX=5,sc=document.getElementById("scroller"),tr=document.getElementById("track"),pc=document.getElementById("pc"),els=[],cur=-1,pad=0,y0=E[0].y;
+function xOf(y){return pad+(y-y0)*PX}
+function build(){
+pad=Math.max(sc.clientWidth/2,70);y0=E[0].y;
+tr.querySelectorAll(".ev,.tick").forEach(function(n){n.remove()});els=[];
+var W=pad*2+(E[E.length-1].y-y0)*PX;tr.style.width=W+"px";
+var ax=document.getElementById("axis");ax.style.width=W+"px";
+for(var t=Math.ceil(y0/50)*50;t<=E[E.length-1].y;t+=50){var k=document.createElement("div");k.className="tick";k.style.left=xOf(t)+"px";k.innerHTML="<span>"+t+"</span>";tr.appendChild(k)}
+E.forEach(function(e,i){
+var d=document.createElement("div");d.className="ev "+(i%2?"down":"up")+(e.lib?" lib":"");d.style.setProperty("--o",(i%4>1?96:0)+"px");d.style.left=xOf(e.y)+"px";
+d.innerHTML='<div class="stem"></div><button class="node" aria-label="'+e.y+'년 '+e.t+'"></button><button class="card"><b>'+e.y+'</b><small>'+e.t+'</small></button>';
+d.querySelectorAll("button").forEach(function(b){b.onclick=function(){sel(i)}});
+tr.appendChild(d);els.push(d)});
+if(cur>=0){els[cur].classList.add("on");center(cur,false)}}
+function center(i,smooth){sc.scrollTo({left:xOf(E[i].y)-sc.clientWidth/2,behavior:smooth?"smooth":"auto"})}
+function sel(i){
+if(i<0||i>=E.length)return;
+if(cur>=0)els[cur].classList.remove("on");
+cur=i;els[i].classList.add("on");center(i,true);
+var e=E[i],g=i?e.y-E[i-1].y:0;
+pc.style.animation="none";void pc.offsetWidth;pc.style.animation="";
+pc.innerHTML='<div class="yr">'+e.y+'년</div><h2>'+e.t+'</h2><p class="sum">'+e.s+'</p><p>'+e.b+'</p><div class="why"><b>왜 중요할까요?</b> '+e.w+'</div>'+
+'<div class="gap">'+(i?"앞 사건("+E[i-1].t+")에서 "+g+"년 뒤에 일어났어요.":"조선 시대의 첫 사건이에요.")+'</div>'+
+'<div class="nav"><button class="b" id="pv"'+(i?"":" disabled")+'>이전 사건</button><span class="cnt">'+(i+1)+" / "+E.length+'</span><button class="b" id="nx"'+(i<E.length-1?"":" disabled")+'>다음 사건</button></div>';
+document.getElementById("pv").onclick=function(){sel(cur-1)};
+document.getElementById("nx").onclick=function(){sel(cur+1)}}
+document.addEventListener("keydown",function(e){if(e.key==="ArrowRight")sel(cur+1);if(e.key==="ArrowLeft")sel(cur-1)});
+window.addEventListener("resize",build);
+function setF(l){E=l?ALL.filter(function(e){return e.lib}):ALL;cur=-1;document.getElementById("fa").setAttribute("aria-pressed",!l);document.getElementById("fl").setAttribute("aria-pressed",!!l);build();sel(0)}
+document.getElementById("fa").onclick=function(){setF(0)};document.getElementById("fl").onclick=function(){setF(1)};
+build();sel(0);
+</script>
+</body>
+</html>
