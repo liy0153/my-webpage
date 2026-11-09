@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>사진 칼로리 계산기</title>
+<style>
+:root{--bg:#faf7f2;--card:#fff;--ink:#2a2622;--mute:#7a7167;--line:#e8e1d6;--acc:#e8590c;--c:#f59f00;--p:#2f9e44;--f:#4263eb;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1815;--card:#26221e;--ink:#f2ece4;--mute:#a69b8e;--line:#3a342d;--acc:#ff8a4c}}
+:root[data-theme="dark"]{--bg:#1b1815;--card:#26221e;--ink:#f2ece4;--mute:#a69b8e;--line:#3a342d;--acc:#ff8a4c}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;line-height:1.5}
+main{max-width:520px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:22px;margin:4px 0 4px}
+.sub{color:var(--mute);font-size:14px;margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+button:disabled{opacity:.5;cursor:default}
+input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-width:0}
+#drop{display:block;text-align:center;padding:40px 16px;border:2px dashed var(--line);border-radius:16px;color:var(--mute);cursor:pointer}
+#drop b{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
+.photo{width:100%;max-height:260px;object-fit:cover;border-radius:12px;display:block}
+.kcal{text-align:center;padding:8px 0 4px}
+.kcal .n{font-size:46px;font-weight:800;color:var(--acc);line-height:1}
+.kcal .u{color:var(--mute);font-size:14px}
+.food{display:flex;gap:8px;margin:12px 0 4px}
+.food input{flex:1;font-size:18px;font-weight:700}.food .delfood{padding:6px 12px;color:var(--mute)}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--line);margin:12px 0 8px}
+.bar i{display:block}
+.macros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.macros div{font-size:13px;color:var(--mute)}
+.macros b{display:block;font-size:18px;color:var(--ink)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+h2{font-size:16px;margin:0 0 10px}
+.ing{display:grid;grid-template-columns:1fr 76px auto;gap:6px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.ing:first-of-type{border-top:0}
+.ing .meta{grid-column:1/-1;font-size:12px;color:var(--mute);margin-top:-2px}
+.ing .del{padding:6px 10px;color:var(--mute)}
+.add{display:grid;grid-template-columns:1fr 76px auto;gap:6px;margin-top:10px}
+.msg{padding:14px;text-align:center;color:var(--mute)}
+.err{color:#e03131}
+.note{font-size:12px;color:var(--mute);text-align:center;margin-top:8px}
+.spin{display:inline-block;width:18px;height:18px;border:3px solid var(--line);border-top-color:var(--acc);border-radius:50%;animation:s 1s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes s{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<main>
+<h1>사진 칼로리 계산기</h1>
+<p class="sub">음식 사진을 올리면 칼로리와 영양성분을 짐작해 드려요. 음식을 추가하면 합산돼요.</p>
+<div id="app"></div>
+<p class="note">AI 추정치이며 실제와 다를 수 있어요. 대략적인 참고용으로 사용하세요.</p>
+</main>
+<input type="file" id="file" accept="image/*" hidden>
+<script>
+(function(){
+var app=document.getElementById('app'),fileEl=document.getElementById('file');
+var S={sample:null,foods:[],pending:null,err:'',busy:''};
+var uid=0;
+function esc(t){var d=document.createElement('div');d.textContent=t==null?'':String(t);return d.innerHTML}
+function r1(n){return Math.round(n*10)/10}
+function mk(name,g,v){var g0=Math.max(g,1);return {id:++uid,name:name,g:g,pk:v.kcal/g0,pc:v.carbs/g0,pp:v.protein/g0,pf:v.fat/g0}}
+function val(i){return {kcal:i.pk*i.g,c:i.pc*i.g,p:i.pp*i.g,f:i.pf*i.g}}
+function ftot(f){var t={kcal:0,c:0,p:0,f:0};f.ings.forEach(function(i){var v=val(i);t.kcal+=v.kcal;t.c+=v.c;t.p+=v.p;t.f+=v.f});return t}
+function alltot(){var t={kcal:0,c:0,p:0,f:0};S.foods.forEach(function(f){var x=ftot(f);t.kcal+=x.kcal;t.c+=x.c;t.p+=x.p;t.f+=x.f});return t}
+async function getSample(){if(!S.sample)S.sample=await claude.use('sample');return S.sample}
+function shrink(file){return new Promise(function(res,rej){var url=URL.createObjectURL(file),img=new Image();
+img.onload=function(){var k=Math.min(1,1024/Math.max(img.width,img.height));var c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);c.toBlob(function(b){URL.revokeObjectURL(url);b?res(b):rej(new Error('변환 실패'))},'image/jpeg',.85)};
+img.onerror=function(){rej(new Error('이미지를 읽을 수 없어요'))};img.src=url})}
+
+async function analyze(file){
+  S.err='';S.busy='사진을 분석하는 중...';S.pending=null;render();
+  try{
+    var blob=await shrink(file);
+    S.pending=URL.createObjectURL(blob);render();
+    var sm=await getSample();
+    if(!sm)throw new Error('AI 기능을 사용할 수 없어요. claude.ai에서 열어 주세요.');
+    var lim=await sm.limits();
+    if(!lim.images)throw new Error('이 환경에서는 이미지 분석이 지원되지 않아요.');
+    var prompt='사진 속 음식을 분석해 JSON만 출력하세요(설명, 코드블록 금지).\n형식: {"name":"한국어 음식명","ingredients":[{"name":"재료명","grams":숫자,"kcal":숫자,"carbs":숫자,"protein":숫자,"fat":숫자}]}\n규칙: 사진에 보이는 실제 양 기준. 주요 재료 3~8개. grams는 g, carbs/protein/fat도 g 단위. 음식이 아니면 {"error":"음식 사진이 아니에요"}.';
+    var out=await sm.json(prompt,{images:[blob],modelTier:'default',cache:false});
+    if(out.error)throw new Error(out.error);
+    var ings=(out.ingredients||[]).map(function(x){return mk(x.name,+x.grams||1,{kcal:+x.kcal||0,carbs:+x.carbs||0,protein:+x.protein||0,fat:+x.fat||0})});
+    if(!ings.length)throw new Error('재료를 찾지 못했어요. 다른 사진으로 시도해 보세요.');
+    S.foods.push({id:++uid,photo:S.pending,name:out.name||'음식',ings:ings});S.pending=null;
+  }catch(e){
+    S.err=(e&&e.message)||'분석에 실패했어요. 다시 시도해 주세요.';
+    if(e&&e.code==='not_granted')S.err='AI 사용 권한이 필요해요.';
+    if(S.pending){URL.revokeObjectURL(S.pending);S.pending=null}
+  }
+  S.busy='';render();
+}
+async function estimate(name,g){
+  var sm=await getSample();if(!sm)throw new Error('AI 기능을 사용할 수 없어요.');
+  var o=await sm.json('"'+name+'" '+g+'g의 영양성분을 추정해 JSON만 출력하세요(설명 금지). 형식: {"kcal":숫자,"carbs":숫자,"protein":숫자,"fat":숫자} (탄수화물, 단백질, 지방은 g)',{modelTier:'quick'});
+  return {kcal:+o.kcal||0,carbs:+o.carbs||0,protein:+o.protein||0,fat:+o.fat||0};
+}
+function foodById(id){return S.foods.find(function(x){return x.id==id})}
+
+function render(){
+  var h='';
+  if(!S.foods.length&&!S.busy){
+    h+='<label id="drop" for="file"><b>📷 사진 올리기</b>눌러서 음식 사진을 선택하세요</label>';
+    if(S.err)h+='<div class="msg err">'+esc(S.err)+'</div>';
+    app.innerHTML=h;return;
+  }
+  if(S.foods.length){
+    var t=alltot(),sum=(t.c+t.p+t.f)||1;
+    h+='<div class="card"><div class="msg" style="padding:0;font-size:13px">총 '+S.foods.length+'가지 음식 합계</div><div class="kcal"><span class="n">'+Math.round(t.kcal).toLocaleString()+'</span> <span class="u">kcal (추정)</span></div>';
+    h+='<div class="bar"><i style="width:'+(t.c/sum*100)+'%;background:var(--c)"></i><i style="width:'+(t.p/sum*100)+'%;background:var(--p)"></i><i style="width:'+(t.f/sum*100)+'%;background:var(--f)"></i></div>';
+    h+='<div class="macros"><div><span class="dot" style="background:var(--c)"></span>탄수화물<b>'+r1(t.c)+'g</b></div><div><span class="dot" style="background:var(--p)"></span>단백질<b>'+r1(t.p)+'g</b></div><div><span class="dot" style="background:var(--f)"></span>지방<b>'+r1(t.f)+'g</b></div></div></div>';
+  }
+  S.foods.forEach(function(f){
+    var ft=ftot(f);
+    h+='<div class="card" data-fid="'+f.id+'"><img class="photo" src="'+f.photo+'" alt="음식 사진">';
+    h+='<div class="food"><input class="fname" value="'+esc(f.name)+'" aria-label="음식명"><button class="delfood" aria-label="음식 삭제">✕</button></div>';
+    h+='<div style="color:var(--acc);font-weight:700;margin-bottom:6px">'+Math.round(ft.kcal)+' kcal · 탄 '+r1(ft.c)+' · 단 '+r1(ft.p)+' · 지 '+r1(ft.f)+'</div>';
+    h+='<h2 style="margin-top:10px">주요 재료</h2>';
+    f.ings.forEach(function(i){
+      var v=val(i);
+      h+='<div class="ing" data-id="'+i.id+'"><input class="in-name" value="'+esc(i.name)+'" aria-label="재료명"><input class="in-g" type="number" min="1" inputmode="numeric" value="'+Math.round(i.g)+'" aria-label="그램"><button class="del" aria-label="재료 삭제">✕</button><div class="meta">'+Math.round(v.kcal)+'kcal · 탄 '+r1(v.c)+' · 단 '+r1(v.p)+' · 지 '+r1(v.f)+' (g 단위로 수정 가능)</div></div>';
+    });
+    h+='<div class="add"><input class="an" placeholder="재료 추가 (예: 계란)"><input class="ag" type="number" min="1" inputmode="numeric" placeholder="g"><button class="pri addb">추가</button></div></div>';
+  });
+  if(S.busy){h+='<div class="card">'+(S.pending?'<img class="photo" src="'+S.pending+'" alt="">':'')+'<div class="msg"><span class="spin"></span>'+esc(S.busy)+'</div></div>'}
+  if(S.err)h+='<div class="card msg err">'+esc(S.err)+'</div>';
+  if(!S.busy){
+    h+='<label for="file" class="pri" style="display:block;text-align:center;padding:12px;border-radius:12px;cursor:pointer;font-weight:600;margin-bottom:10px">➕ 음식 추가</label>';
+    h+='<button id="reset" style="width:100%">🔄 다시 시작</button>';
+  }
+  app.innerHTML=h;
+}
+app.addEventListener('change',async function(e){
+  var t=e.target,card=t.closest('[data-fid]');if(!card)return;
+  var f=foodById(card.dataset.fid);if(!f)return;
+  if(t.classList.contains('fname')){f.name=t.value;return}
+  var row=t.closest('.ing');if(!row)return;
+  var i=f.ings.find(function(x){return x.id==row.dataset.id});if(!i)return;
+  if(t.classList.contains('in-g')){var g=parseFloat(t.value);if(g>0)i.g=g;render()}
+  else if(t.classList.contains('in-name')){
+    var nm=t.value.trim();if(!nm||nm===i.name){render();return}
+    S.busy='"'+nm+'" 영양 추정 중...';S.err='';var old=i.name;i.name=nm;render();
+    try{var n=mk(nm,i.g,await estimate(nm,i.g));i.pk=n.pk;i.pc=n.pc;i.pp=n.pp;i.pf=n.pf}catch(er){i.name=old;S.err=er.message||'추정에 실패했어요.'}
+    S.busy='';render();
+  }
+});
+app.addEventListener('click',async function(e){
+  var t=e.target,card=t.closest('[data-fid]'),f=card&&foodById(card.dataset.fid);
+  if(t.classList.contains('del')&&f){var id=t.closest('.ing').dataset.id;f.ings=f.ings.filter(function(x){return x.id!=id});render()}
+  else if(t.classList.contains('delfood')&&f){S.foods=S.foods.filter(function(x){return x!==f});URL.revokeObjectURL(f.photo);render()}
+  else if(t.classList.contains('addb')&&f){
+    var nm=card.querySelector('.an').value.trim(),g=parseFloat(card.querySelector('.ag').value);
+    if(!nm||!(g>0)){S.err='재료명과 g 양을 입력해 주세요.';render();return}
+    S.err='';S.busy='"'+nm+'" 영양 추정 중...';render();
+    try{f.ings.push(mk(nm,g,await estimate(nm,g)))}catch(er){S.err=er.message||'추정에 실패했어요.'}
+    S.busy='';render();
+  }else if(t.id==='reset'){
+    S.foods.forEach(function(x){URL.revokeObjectURL(x.photo)});S.foods=[];S.err='';S.busy='';S.pending=null;fileEl.value='';render();
+  }
+});
+fileEl.addEventListener('change',function(){if(fileEl.files[0]){var fl=fileEl.files[0];fileEl.value='';analyze(fl)}});
+render();
+})();
+</script>
+</body>
+</html>
