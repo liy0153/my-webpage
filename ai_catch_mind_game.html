@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI 캐치마인드 (그림 맞추기)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti for Celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f4f8;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .font-jua {
+            font-family: 'Jua', sans-serif;
+        }
+
+        /* Prevent scrolling while drawing on canvas */
+        canvas {
+            touch-action: none;
+        }
+
+        .pulse-slow {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .85; transform: scale(0.98); }
+        }
+
+        .bounce-gentle {
+            animation: bounce 1.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-slate-800">
+
+    <!-- Header Section -->
+    <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-20">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="resetToStart()">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xl shadow-md">
+                    <i class="fa-solid fa-paintbrush"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-black font-jua text-indigo-600 leading-none">AI 캐치마인드</h1>
+                    <p class="text-xs text-slate-400 font-medium mt-0.5">내가 그리고, AI가 맞추는 창의 교실</p>
+                </div>
+            </div>
+
+            <!-- Header Stats / Badge -->
+            <div id="game-status-badge" class="hidden flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full text-xs md:text-sm font-bold border border-indigo-100">
+                <i class="fa-solid fa-shapes"></i>
+                <span id="badge-category-text">동물</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-5xl mx-auto w-full px-4 py-6 flex-1 flex flex-col justify-center items-center">
+
+        <!-- SCREEN 1: CATEGORY SELECTION -->
+        <section id="screen-start" class="w-full max-w-3xl flex flex-col items-center">
+            <div class="text-center mb-8">
+                <span class="inline-block bg-purple-100 text-purple-700 font-bold px-3 py-1 rounded-full text-sm mb-3">
+                    🎮 AI 시각지능 맞춤 학습
+                </span>
+                <h2 class="text-3xl md:text-4xl font-black font-jua text-slate-800 mb-3">
+                    어떤 주제로 그림을 그려볼까요?
+                </h2>
+                <p class="text-slate-500 text-sm md:text-base">
+                    카테고리를 선택하면 비밀 제시어가 나타납니다. 60초 안에 멋지게 그려보세요!
+                </p>
+            </div>
+
+            <!-- Categories Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 w-full mb-8">
+                <!-- Animal -->
+                <button onclick="selectCategory('동물')" class="group bg-white p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-500 hover:shadow-xl transition-all duration-200 flex flex-col items-center gap-3">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                        🐶
+                    </div>
+                    <span class="font-bold text-lg text-slate-700 group-hover:text-indigo-600">동물</span>
+                </button>
+
+                <!-- Fruit -->
+                <button onclick="selectCategory('과일')" class="group bg-white p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-500 hover:shadow-xl transition-all duration-200 flex flex-col items-center gap-3">
+                    <div class="w-16 h-16 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                        🍎
+                    </div>
+                    <span class="font-bold text-lg text-slate-700 group-hover:text-indigo-600">과일</span>
+                </button>
+
+                <!-- Vegetable -->
+                <button onclick="selectCategory('채소')" class="group bg-white p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-500 hover:shadow-xl transition-all duration-200 flex flex-col items-center gap-3">
+                    <div class="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                        🥕
+                    </div>
+                    <span class="font-bold text-lg text-slate-700 group-hover:text-indigo-600">채소</span>
+                </button>
+
+                <!-- Object -->
+                <button onclick="selectCategory('사물')" class="group bg-white p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-500 hover:shadow-xl transition-all duration-200 flex flex-col items-center gap-3">
+                    <div class="w-16 h-16 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                        ⏰
+                    </div>
+                    <span class="font-bold text-lg text-slate-700 group-hover:text-indigo-600">사물</span>
+                </button>
+
+                <!-- Vehicle -->
+                <button onclick="selectCategory('교통수단')" class="group bg-white p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-500 hover:shadow-xl transition-all duration-200 flex flex-col items-center gap-3 col-span-2 sm:col-span-1">
+                    <div class="w-16 h-16 rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                        🚀
+                    </div>
+                    <span class="font-bold text-lg text-slate-700 group-hover:text-indigo-600">교통수단</span>
+                </button>
+            </div>
+
+            <!-- How to play box -->
+            <div class="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-5 w-full flex items-start gap-4">
+                <div class="text-indigo-500 text-2xl mt-0.5">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+                <div class="text-sm text-indigo-900 leading-relaxed">
+                    <p class="font-bold mb-1">플레이 가이드</p>
+                    <ul class="list-disc list-inside text-indigo-800 space-y-1">
+                        <li>AI 비전에게는 <strong>카테고리 힌트만</strong> 제공되며 정답은 알려주지 않습니다.</li>
+                        <li>태블릿이나 마우스로 제시어를 정확하고 명확하게 그려보세요.</li>
+                        <li>제한시간(60초)이 지나면 자동으로 그림이 저장되고 AI가 추론을 시작합니다.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: GAMEPLAY & CANVAS -->
+        <section id="screen-game" class="w-full max-w-4xl hidden flex-col items-center">
+            
+            <!-- Game Info Header Bar -->
+            <div class="w-full bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full" id="game-category-label">동물</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-400 text-xs font-bold uppercase">제시어</span>
+                        <span class="text-2xl font-black font-jua text-indigo-600 bg-indigo-50 px-4 py-0.5 rounded-lg border border-indigo-100" id="target-word-display">
+                            ---
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Timer Gauge -->
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <div class="text-slate-400 text-xs font-bold flex items-center gap-1">
+                        <i class="fa-regular fa-clock"></i>
+                        <span>남은시간</span>
+                    </div>
+                    <div class="flex-1 sm:w-48 bg-slate-100 h-4 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                        <div id="timer-bar" class="bg-emerald-500 h-full rounded-full transition-all duration-1000 w-full"></div>
+                    </div>
+                    <span id="timer-text" class="font-mono font-bold text-lg text-slate-700 min-w-[3rem] text-right">60초</span>
+                </div>
+            </div>
+
+            <!-- Main Canvas Layout Grid -->
+            <div class="w-full grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+                
+                <!-- Canvas Workspace (3 Columns on MD) -->
+                <div class="md:col-span-3 bg-white p-3 rounded-2xl border-2 border-slate-200 shadow-md flex flex-col items-center relative">
+                    
+                    <!-- Canvas Element -->
+                    <div class="w-full aspect-[4/3] bg-white rounded-xl overflow-hidden border border-slate-200 relative cursor-crosshair">
+                        <canvas id="drawing-canvas" class="w-full h-full block bg-white"></canvas>
+                        
+                        <!-- Canvas Locked Overlay (When time is up / analyzing) -->
+                        <div id="canvas-lock-overlay" class="hidden absolute inset-0 bg-slate-900/40 backdrop-blur-xs flex flex-col items-center justify-center text-white z-10 rounded-xl">
+                            <i class="fa-solid fa-lock text-4xl mb-2"></i>
+                            <p class="font-bold text-lg font-jua">캔버스가 잠겼습니다</p>
+                        </div>
+                    </div>
+
+                    <!-- Action Control Toolbar below canvas -->
+                    <div class="w-full flex justify-between items-center mt-3 pt-2 border-t border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <button onclick="clearCanvas()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>지우기</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button id="btn-submit" onclick="submitDrawing()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-sm shadow-md hover:shadow-indigo-200 transition-all transform active:scale-95 flex items-center gap-2">
+                            <span>AI에게 그림 제출하기</span>
+                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Drawing Controls Toolbar (1 Column on MD) -->
+                <div class="md:col-span-1 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-5 w-full">
+                    
+                    <!-- Tools Selection -->
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 mb-2 uppercase">도구 선택</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="tool-pen" onclick="setTool('pen')" class="tool-btn active p-2.5 rounded-xl border border-indigo-500 bg-indigo-50 text-indigo-700 flex flex-col items-center gap-1 transition">
+                                <i class="fa-solid fa-pen text-lg"></i>
+                                <span class="text-xs font-bold">펜</span>
+                            </button>
+                            <button id="tool-eraser" onclick="setTool('eraser')" class="tool-btn p-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 flex flex-col items-center gap-1 transition">
+                                <i class="fa-solid fa-eraser text-lg"></i>
+                                <span class="text-xs font-bold">지우개</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Brush Size Slider -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <p class="text-xs font-bold text-slate-400 uppercase">두께 조절</p>
+                            <span id="brush-size-text" class="text-xs font-bold text-slate-600">8px</span>
+                        </div>
+                        <input type="range" id="brush-size" min="2" max="40" value="8" oninput="updateBrushSize(this.value)" class="w-full accent-indigo-600 bg-slate-100 h-2 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- Color Palette -->
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 mb-2 uppercase">색상 선택</p>
+                        <div class="grid grid-cols-5 gap-2" id="color-palette">
+                            <!-- Palette colors dynamically generated or listed -->
+                            <button onclick="setColor('#000000')" class="color-swatch w-full aspect-square rounded-full border-2 border-slate-300 ring-2 ring-indigo-500 scale-110" style="background-color: #000000;"></button>
+                            <button onclick="setColor('#ef4444')" class="color-swatch w-full aspect-square rounded-full border-2 border-white shadow-sm" style="background-color: #ef4444;"></button>
+                            <button onclick="setColor('#f97316')" class="color-swatch w-full aspect-square rounded-full border-2 border-white shadow-sm" style="background-color: #f97316;"></button>
+                            <button onclick="setColor('#eab308')" class="color-swatch w-full aspect-square rounded-full border-2 border-white shadow-sm" style="background-color: #eab308;"></button>
+                            <button onclick="setColor('#22c55e')" class="color-swatch w-full aspect-square rounded-full border-2 border-white shadow-sm" style="background-color: #22c55e;"></button>
+                            <button onclick="setColor('#06b6d4')" class="color-swatch w-full aspect-square rounded-full border-2 border-white shadow-sm" style="background-color: #06b6d4;"></button>
+                            <button onclick="setColor('#3b82f6')" class="color-swatch w-full aspect-square rounded-full border-2 border-white shadow-sm" style="background-color: #3b82f6;"></button>
+                            <button onclick="setColor('#a855f7')" class="color-swatch w-full aspect-square rounded-full border-2 border-white shadow-sm" style="background-color: #a855f7;"></button>
+                            <button onclick="setColor('#ec4899')" class="color-swatch w-full aspect-square rounded-full border-2 border-white shadow-sm" style="background-color: #ec4899;"></button>
+                            <button onclick="setColor('#78350f')" class="color-swatch w-full aspect-square rounded-full border-2 border-white shadow-sm" style="background-color: #78350f;"></button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: LOADING OVERLAY / STATE -->
+        <section id="screen-loading" class="w-full max-w-md hidden flex-col items-center text-center py-12">
+            <div class="relative mb-6">
+                <div class="w-28 h-28 rounded-3xl bg-indigo-100 flex items-center justify-center text-5xl text-indigo-600 pulse-slow border-4 border-indigo-200">
+                    🤖
+                </div>
+                <div class="absolute -bottom-2 -right-2 bg-purple-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg bounce-gentle">
+                    <i class="fa-solid fa-brain text-lg"></i>
+                </div>
+            </div>
+            
+            <h3 class="text-2xl font-black font-jua text-slate-800 mb-2">AI가 생각 중입니다...</h3>
+            <p class="text-slate-500 text-sm max-w-xs leading-relaxed mb-6">
+                제미나이 시각분석 모델이 여러분이 그린 그림의 특징을 살펴보고 있습니다. 과연 정답을 맞출 수 있을까요?
+            </p>
+
+            <div class="w-48 bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div class="bg-indigo-600 h-full w-full animate-pulse"></div>
+            </div>
+        </section>
+
+        <!-- SCREEN 4: RESULT SCREEN -->
+        <section id="screen-result" class="w-full max-w-3xl hidden flex-col items-center">
+            
+            <!-- Result Result Banner Header -->
+            <div id="result-banner" class="w-full rounded-3xl p-6 text-center text-white shadow-xl mb-6 flex flex-col items-center justify-center relative overflow-hidden">
+                <div class="text-6xl mb-2" id="result-emoji">🎉</div>
+                <h2 class="text-3xl md:text-4xl font-black font-jua mb-1" id="result-title">정답입니다!</h2>
+                <p class="text-sm md:text-base opacity-90 font-medium" id="result-subtitle">AI가 그림을 완벽하게 맞췄어요!</p>
+            </div>
+
+            <!-- Comparison Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
+                
+                <!-- Drawn Image Snapshot Card -->
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center gap-1.5">
+                        <i class="fa-solid fa-palette text-indigo-500"></i>
+                        내가 그린 그림
+                    </p>
+                    <div class="w-full aspect-[4/3] bg-slate-50 rounded-xl overflow-hidden border border-slate-200 flex items-center justify-center">
+                        <img id="result-image" src="" alt="User Drawing" class="w-full h-full object-contain">
+                    </div>
+                </div>
+
+                <!-- Answer & Inference Info Card -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center gap-6">
+                    
+                    <!-- Target Answer -->
+                    <div class="border-b border-slate-100 pb-4">
+                        <span class="text-xs font-bold text-slate-400 block mb-1">실제 정답</span>
+                        <div class="text-2xl font-black font-jua text-slate-800 flex items-center justify-between">
+                            <span id="result-target-word">사자</span>
+                            <span class="text-xs px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-normal" id="result-category">동물</span>
+                        </div>
+                    </div>
+
+                    <!-- AI Prediction -->
+                    <div>
+                        <span class="text-xs font-bold text-indigo-500 block mb-1 flex items-center gap-1">
+                            <i class="fa-solid fa-robot"></i> AI 추론 응답
+                        </span>
+                        <div class="text-3xl font-black font-jua text-indigo-600 bg-indigo-50/70 p-3 rounded-xl border border-indigo-100 flex items-center justify-between">
+                            <span id="result-ai-guess">사자</span>
+                            <span id="result-match-badge" class="text-xs px-2.5 py-1 rounded-md text-white font-sans font-bold">일치</span>
+                        </div>
+                    </div>
+
+                    <!-- Educational Feedback Note -->
+                    <div class="text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200 leading-relaxed">
+                        💡 <strong>비전 분석 팁:</strong> AI는 그림의 형태, 특징적 윤곽, 윤곽선의 배치를 바탕으로 단어를 추론합니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Retry / Restart Button -->
+            <button onclick="resetToStart()" class="px-8 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg shadow-lg hover:shadow-indigo-300 transition-all transform active:scale-95 flex items-center gap-3">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>다른 문제 도전하기</span>
+            </button>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-slate-400 border-t border-slate-200 bg-white">
+        <p>AI Catch Mind &copy; 2026 Powered by Gemini Vision API</p>
+    </footer>
+
+    <!-- Application Script -->
+    <script>
+        // WORD DICTIONARY BY CATEGORY
+        const WORDS_DATABASE = {
+            '동물': ['사자', '호랑이', '강아지', '고양이', '코끼리', '기린', '토끼', '곰', '돼지', '원숭이', '오리', '펭귄'],
+            '과일': ['사과', '바나나', '포도', '딸기', '수박', '복숭아', '파인애플', '오렌지', '참외', '감'],
+            '채소': ['당근', '브로콜리', '양파', '오이', '토마토', '가지', '무', '옥수수', '고추', '감자'],
+            '사물': ['연필', '시계', '안경', '가방', '모자', '우산', '가위', '책', '컵', '전화기'],
+            '교통수단': ['비행기', '자동차', '기차', '자전거', '배', '버스', '헬리콥터', '오토바이', '경찰차', '소방차']
+        };
+
+        // GAME STATE VARIABLES
+        let currentCategory = '';
+        let currentTargetWord = '';
+        let timeLeft = 60;
+        let timerInterval = null;
+        let isDrawing = false;
+        let currentTool = 'pen'; // 'pen' | 'eraser'
+        let currentColor = '#000000';
+        let currentLineWidth = 8;
+        let isGameLocked = false;
+
+        // CANVAS ELEMENTS & CONTEXT
+        const canvas = document.getElementById('drawing-canvas');
+        const ctx = canvas.getContext('2d');
+        const canvasLockOverlay = document.getElementById('canvas-lock-overlay');
+
+        // INITIALIZATION ON WINDOW LOAD
+        window.onload = () => {
+            setupCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        };
+
+        // SETUP CANVAS ATTRIBUTES & LISTENERS
+        function setupCanvas() {
+            resizeCanvas();
+
+            // Mouse Events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+
+            // Touch Events (Tablets & Mobile)
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousedown', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            }, { passive: false });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousemove', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            }, { passive: false });
+
+            canvas.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                const mouseEvent = new MouseEvent('mouseup', {});
+                canvas.dispatchEvent(mouseEvent);
+            }, { passive: false });
+        }
+
+        // RESIZE CANVAS WHILE PRESERVING CONTENT
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const rect = container.getBoundingClientRect();
+            
+            // Save image data before resizing if canvas has content
+            let tempImage = null;
+            if (canvas.width > 0 && canvas.height > 0) {
+                tempImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            }
+
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            // Fill white background (crucial for vision API snapshot)
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Set default line styles
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Restore content if existed
+            if (tempImage) {
+                ctx.putImageData(tempImage, 0, 0);
+            }
+        }
+
+        // START DRAWING LOGIC
+        function startDrawing(e) {
+            if (isGameLocked) return;
+            isDrawing = true;
+            const pos = getCanvasPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        // DRAWING LOGIC
+        function draw(e) {
+            if (!isDrawing || isGameLocked) return;
+            const pos = getCanvasPos(e);
+
+            if (currentTool === 'eraser') {
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = currentLineWidth * 2; // Make eraser slightly wider
+            } else {
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = currentLineWidth;
+            }
+
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
+
+        // STOP DRAWING
+        function stopDrawing() {
+            if (!isDrawing) return;
+            isDrawing = false;
+            ctx.closePath();
+        }
+
+        // GET MOUSE/TOUCH POSITION RELATIVE TO CANVAS
+        function getCanvasPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
+
+        // CLEAR CANVAS CONTENT
+        function clearCanvas() {
+            if (isGameLocked) return;
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // TOOL SELECTION (PEN / ERASER)
+        function setTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('.tool-btn').forEach(btn => {
+                btn.classList.remove('border-indigo-500', 'bg-indigo-50', 'text-indigo-700');
+                btn.classList.add('border-slate-200', 'bg-white', 'text-slate-600');
+            });
+
+            const activeBtn = document.getElementById(`tool-${tool}`);
+            activeBtn.classList.remove('border-slate-200', 'bg-white', 'text-slate-600');
+            activeBtn.classList.add('border-indigo-500', 'bg-indigo-50', 'text-indigo-700');
+        }
+
+        // COLOR SELECTION
+        function setColor(color) {
+            currentColor = color;
+            setTool('pen'); // Switch to pen on color change
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.classList.remove('ring-2', 'ring-indigo-500', 'scale-110');
+            });
+            event.currentTarget.classList.add('ring-2', 'ring-indigo-500', 'scale-110');
+        }
+
+        // BRUSH SIZE UPDATE
+        function updateBrushSize(val) {
+            currentLineWidth = val;
+            document.getElementById('brush-size-text').innerText = `${val}px`;
+        }
+
+        // GAME FLOW: CATEGORY SELECTION
+        function selectCategory(category) {
+            currentCategory = category;
+            
+            // Randomly select word from category
+            const wordsList = WORDS_DATABASE[category];
+            currentTargetWord = wordsList[Math.floor(Math.random() * wordsList.length)];
+
+            // Update UI Displays
+            document.getElementById('game-category-label').innerText = category;
+            document.getElementById('badge-category-text').innerText = category;
+            document.getElementById('target-word-display').innerText = currentTargetWord;
+
+            // Show Badge in header
+            document.getElementById('game-status-badge').classList.remove('hidden');
+
+            // Switch Screen to Game
+            switchScreen('game');
+
+            // Reset and Start Game Timer
+            resetCanvasAndGame();
+            startTimer();
+        }
+
+        // START COUNTDOWN TIMER (60 SECONDS)
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 60;
+            updateTimerUI();
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        // UPDATE TIMER UI ELEMENTS
+        function updateTimerUI() {
+            const timerText = document.getElementById('timer-text');
+            const timerBar = document.getElementById('timer-bar');
+
+            timerText.innerText = `${timeLeft}초`;
+            const percentage = (timeLeft / 60) * 100;
+            timerBar.style.width = `${percentage}%`;
+
+            if (timeLeft <= 10) {
+                timerBar.classList.remove('bg-emerald-500');
+                timerBar.classList.add('bg-rose-500');
+                timerText.classList.add('text-rose-600', 'animate-pulse');
+            } else {
+                timerBar.classList.remove('bg-rose-500');
+                timerBar.classList.add('bg-emerald-500');
+                timerText.classList.remove('text-rose-600', 'animate-pulse');
+            }
+        }
+
+        // HANDLE TIMER TIMEOUT
+        function handleTimeOut() {
+            lockGame();
+            submitDrawing();
+        }
+
+        // LOCK CANVAS INTERACTION
+        function lockGame() {
+            isGameLocked = true;
+            canvasLockOverlay.classList.remove('hidden');
+        }
+
+        // RESET GAME & CANVAS STATE
+        function resetCanvasAndGame() {
+            isGameLocked = false;
+            canvasLockOverlay.classList.add('hidden');
+            setTimeout(resizeCanvas, 50); // Ensure size matches container
+        }
+
+        // SUBMIT DRAWING TO GEMINI VISION API
+        async function submitDrawing() {
+            clearInterval(timerInterval);
+            lockGame();
+
+            // Export canvas as JPEG base64
+            const imageBase64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+
+            // Show Loading Screen
+            switchScreen('loading');
+
+            try {
+                // Call Gemini Vision API
+                const aiGuessWord = await callGeminiVisionApi(imageBase64, currentCategory);
+                showResult(aiGuessWord);
+            } catch (error) {
+                console.error("Gemini Vision API Error:", error);
+                // Fallback graceful handling
+                showResult("추론 실패");
+            }
+        }
+
+        // CALL GEMINI VISION API (gemini-2.5-flash)
+        async function callGeminiVisionApi(base64ImageData, category) {
+            const apiKey = ""; // Canvas runtime injects API key automatically
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+            // System instructions strictly asking for ONLY a single Korean noun belonging to category
+            const systemPrompt = `당신은 초·중·고등학생 그림 맞추기 게임(캐치마인드)의 AI 출제 심사위원입니다.
+제시된 그림을 시각적으로 분석하고, 카테고리 [${category}]에 속하는 가장 유력한 '한국어 명사 한 단어'만 대답하세요.
+- 설명, 부연설명, 문장, 기호(!, .)를 절대 포함하지 마세요.
+- 오직 단어 한 개만 출력하세요. (예시: 사자)`;
+
+            const userPrompt = `이 그림이 카테고리 [${category}] 중에서 무엇을 그린 것인지 한국어 단어 하나로만 말해주세요.`;
+
+            const payload = {
+                contents: [
+                    {
+                        role: "user",
+                        parts: [
+                            { text: userPrompt },
+                            {
+                                inlineData: {
+                                    mimeType: "image/jpeg",
+                                    data: base64ImageData
+                                }
+                            }
+                        ]
+                    }
+                ],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+
+            // Implement Exponential Backoff for resilient fetch
+            let delay = 1000;
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP Error status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const candidateText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                    if (candidateText) {
+                        // Clean output string (trim spaces, remove punctuation)
+                        const cleanedText = candidateText.trim().replace(/[.,!?'"]/g, '');
+                        return cleanedText;
+                    }
+                } catch (err) {
+                    if (i === 2) throw err;
+                    await new Promise(res => setTimeout(res, delay));
+                    delay *= 2;
+                }
+            }
+            throw new Error("Failed after retries");
+        }
+
+        // DISPLAY GAME RESULT
+        function showResult(aiGuess) {
+            // Get image snapshot data URL for display
+            const dataUrl = canvas.toDataURL('image/png');
+            document.getElementById('result-image').src = dataUrl;
+
+            document.getElementById('result-target-word').innerText = currentTargetWord;
+            document.getElementById('result-ai-guess').innerText = aiGuess;
+            document.getElementById('result-category').innerText = currentCategory;
+
+            const banner = document.getElementById('result-banner');
+            const resultTitle = document.getElementById('result-title');
+            const resultSubtitle = document.getElementById('result-subtitle');
+            const resultEmoji = document.getElementById('result-emoji');
+            const matchBadge = document.getElementById('result-match-badge');
+
+            // Compare Answer (strip whitespace)
+            const cleanTarget = currentTargetWord.trim();
+            const cleanGuess = aiGuess.trim();
+            const isCorrect = (cleanTarget === cleanGuess);
+
+            if (isCorrect) {
+                // SUCCESS STATE
+                banner.className = "w-full rounded-3xl p-6 text-center text-white shadow-xl mb-6 flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-r from-emerald-500 to-teal-600";
+                resultEmoji.innerText = "🎉";
+                resultTitle.innerText = "정답입니다!";
+                resultSubtitle.innerText = "AI가 당신의 그림을 명확하게 파악했습니다!";
+                
+                matchBadge.innerText = "일치";
+                matchBadge.className = "text-xs px-2.5 py-1 rounded-md text-white font-sans font-bold bg-emerald-500";
+
+                // Trigger Confetti Celebration
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                // INCORRECT STATE
+                banner.className = "w-full rounded-3xl p-6 text-center text-white shadow-xl mb-6 flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-r from-amber-500 to-rose-500";
+                resultEmoji.innerText = "🤔";
+                resultTitle.innerText = "아쉬워요!";
+                resultSubtitle.innerText = "AI가 조금 다르게 생각했네요. 다음엔 더 특징을 살려보세요!";
+
+                matchBadge.innerText = "불일치";
+                matchBadge.className = "text-xs px-2.5 py-1 rounded-md text-white font-sans font-bold bg-amber-500";
+            }
+
+            switchScreen('result');
+        }
+
+        // NAVIGATION / SCREEN SWITCHER
+        function switchScreen(screenName) {
+            const screens = ['start', 'game', 'loading', 'result'];
+            screens.forEach(s => {
+                const el = document.getElementById(`screen-${s}`);
+                if (s === screenName) {
+                    el.classList.remove('hidden');
+                    el.classList.add('flex');
+                } else {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                }
+            });
+        }
+
+        // RESET TO START SCREEN
+        function resetToStart() {
+            clearInterval(timerInterval);
+            document.getElementById('game-status-badge').classList.add('hidden');
+            switchScreen('start');
+        }
+    </script>
+</body>
+</html>
