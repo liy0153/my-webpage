@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>시계 읽기 연습</title>
+<style>
+:root{--bg:#fff8e7;--card:#ffffff;--text:#3a2e1f;--accent:#ff8a3d;--ok:#2e9e5b;--bad:#e0473e;--muted:#8a7a63;--line:#e8dcc4;--hint:#fff1c9;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1f1a14;--card:#2b2419;--text:#f5ead4;--accent:#ffa05c;--ok:#5fd18a;--bad:#ff7a70;--muted:#b9a98c;--line:#4a3f2e;--hint:#4a3d1c}}
+:root[data-theme="dark"]{--bg:#1f1a14;--card:#2b2419;--text:#f5ead4;--accent:#ffa05c;--ok:#5fd18a;--bad:#ff7a70;--muted:#b9a98c;--line:#4a3f2e;--hint:#4a3d1c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Jua","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:14px 14px 30px}
+h1{font-size:24px;text-align:center;margin:6px 0 12px}
+.levels{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.lv{border:2px solid var(--line);background:var(--card);color:var(--text);border-radius:14px;padding:10px 6px;font-size:16px;font-family:inherit;cursor:pointer}
+.lv b{display:block;font-size:17px}
+.lv small{color:var(--muted);font-size:13px}
+.lv.on{border-color:var(--accent);background:var(--accent);color:#fff}
+.lv.on small{color:#fff}
+.card{background:var(--card);border-radius:20px;padding:14px;margin-top:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+#clockBox{position:relative}
+svg{width:100%;height:auto;display:block;max-width:360px;margin:0 auto}
+.inputs{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:6px;font-size:24px}
+.field{display:flex;align-items:center;justify-content:center;gap:10px}
+.field .unit{width:34px;text-align:left}
+.step{width:56px;height:56px;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:34px;font-weight:bold;line-height:1;font-family:inherit;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.step:active{transform:scale(.92)}
+.step:disabled{opacity:.4}
+.step.minus{background:#6f8fd8}
+.inputs input{width:84px;font-size:28px;text-align:center;padding:8px;border:3px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);font-family:inherit}
+.inputs input:focus{outline:none;border-color:var(--accent)}
+.inputs input{width:100px;-moz-appearance:textfield}
+.inputs input::-webkit-outer-spin-button,.inputs input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.btn{display:block;width:100%;margin-top:12px;padding:14px;font-size:20px;font-family:inherit;border:0;border-radius:14px;background:var(--accent);color:#fff;cursor:pointer}
+.btn:disabled{opacity:.5}
+#msg{min-height:30px;text-align:center;font-size:20px;margin-top:10px}
+#msg.ok{color:var(--ok)}#msg.bad{color:var(--bad)}
+.hint{background:var(--hint);border-radius:12px;padding:10px 12px;margin-top:8px;font-size:16px;line-height:1.5;display:none}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stats div{background:var(--bg);border-radius:12px;padding:8px}
+.stats span{display:block;font-size:13px;color:var(--muted)}
+.stats b{font-size:26px}
+.stats .c b{color:var(--ok)}.stats .w b{color:var(--bad)}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:50}
+.row{display:flex;gap:8px;margin-top:8px}
+.row .btn{margin-top:0;font-size:16px;padding:10px;background:var(--card);color:var(--text);border:2px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🕒 시계 읽기 연습</h1>
+<div class="levels" id="levels"></div>
+
+<div class="card">
+<div id="clockBox"><svg id="clock" viewBox="0 0 300 300" aria-label="아날로그 시계"></svg></div>
+<div class="inputs">
+<div class="field">
+<button type="button" class="step minus" data-t="h" data-d="-1" aria-label="시 줄이기">−</button>
+<input id="h" type="number" inputmode="numeric" min="1" max="12" placeholder="시">
+<button type="button" class="step" data-t="h" data-d="1" aria-label="시 늘리기">+</button>
+<span class="unit">시</span>
+</div>
+<div class="field" id="mField">
+<button type="button" class="step minus" data-t="m" data-d="-1" aria-label="분 줄이기">−</button>
+<input id="m" type="number" inputmode="numeric" min="0" max="59" placeholder="분">
+<button type="button" class="step" data-t="m" data-d="1" aria-label="분 늘리기">+</button>
+<span class="unit">분</span>
+</div>
+</div>
+<button class="btn" id="check">정답 확인</button>
+<div id="msg"></div>
+<div class="hint" id="hint"></div>
+<div class="row"><button class="btn" id="next" style="display:none">다음 문제 ▶</button></div>
+</div>
+
+<div class="card stats">
+<div><span>총 문제</span><b id="sTotal">0</b></div>
+<div class="c"><span>정답</span><b id="sOk">0</b></div>
+<div class="w"><span>오답</span><b id="sBad">0</b></div>
+</div>
+<div class="row"><button class="btn" id="reset">기록 초기화</button></div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+const LEVELS=[
+ {n:1,t:"정시",d:"예: 3시",step:60},
+ {n:2,t:"30분 단위",d:"예: 3시 30분",step:30},
+ {n:3,t:"5분 단위",d:"예: 3시 15분",step:5},
+ {n:4,t:"1분 단위",d:"예: 3시 17분",step:1}
+];
+let level=1,cur=null,locked=false,stats={t:0,o:0,b:0},timer=null;
+const NS="http://www.w3.org/2000/svg";
+const svg=document.getElementById("clock");
+
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);(parent||svg).appendChild(e);return e}
+
+function buildClock(){
+ svg.innerHTML="";
+ el("circle",{cx:150,cy:150,r:144,fill:"#fff",stroke:"#ff8a3d","stroke-width":8});
+ el("circle",{cx:150,cy:150,r:136,fill:"#fffdf6",stroke:"#e8dcc4","stroke-width":2});
+ for(let i=0;i<60;i++){
+  const a=i*6*Math.PI/180,big=i%5===0;
+  const r1=big?118:124,r2=132;
+  el("line",{x1:150+r1*Math.sin(a),y1:150-r1*Math.cos(a),x2:150+r2*Math.sin(a),y2:150-r2*Math.cos(a),stroke:big?"#3a2e1f":"#8a7a63","stroke-width":big?3.5:1.5,"stroke-linecap":"round"});
+ }
+ for(let n=1;n<=12;n++){
+  const a=n*30*Math.PI/180,r=95;
+  const t=el("text",{x:150+r*Math.sin(a),y:150-r*Math.cos(a),"text-anchor":"middle","dominant-baseline":"central","font-size":26,"font-weight":"bold",fill:"#3a2e1f","font-family":"sans-serif"});
+  t.textContent=n;
+ }
+ el("g",{id:"hourHand"});el("g",{id:"minHand"});
+ el("circle",{cx:150,cy:150,r:8,fill:"#ff8a3d"});
+ el("circle",{cx:150,cy:150,r:3,fill:"#fff"});
+}
+function hand(id,len,w,color,deg){
+ const g=document.getElementById(id);g.innerHTML="";
+ el("line",{x1:150,y1:150+14,x2:150,y2:150-len,stroke:color,"stroke-width":w,"stroke-linecap":"round",transform:`rotate(${deg} 150 150)`},g);
+}
+// 수학적 각도: 분침 = 분*6°, 시침 = (시%12)*30° + 분*0.5°
+function draw(h,m){
+ hand("hourHand",62,9,"#3a2e1f",(h%12)*30+m*0.5);
+ hand("minHand",100,5,"#e0473e",m*6);
+}
+
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function newQ(){
+ clearTimeout(timer);locked=false;
+ const step=LEVELS[level-1].step;
+ let h=rand(1,12),m=0;
+ if(step<60){const opts=60/step;m=rand(0,opts-1)*step;}
+ // 직전과 같은 문제 피하기
+ if(cur&&cur.h===h&&cur.m===m){return newQ()}
+ cur={h,m};draw(h,m);
+ hIn.value="";mIn.value="";hIn.disabled=false;mIn.disabled=false;
+ document.getElementById("mField").style.display=level===1?"none":"flex";
+ msg.textContent="지금 몇 시 몇 분일까요?";msg.className="";
+ hint.style.display="none";nextBtn.style.display="none";checkBtn.disabled=false;
+ hIn.focus();
+}
+
+function check(){
+ if(locked)return;
+ if(level===1)mIn.value="0";
+ if(hIn.value===""||mIn.value===""){msg.textContent="시와 분을 모두 입력해 주세요 ✏️";msg.className="bad";return}
+ const h=+hIn.value,m=+mIn.value;
+ locked=true;checkBtn.disabled=true;stats.t++;
+ if(h===cur.h&&m===cur.m){
+  stats.o++;msg.textContent="🎉 정답이에요! 잘했어요!";msg.className="ok";
+  burst();update();
+  timer=setTimeout(newQ,1800);
+ }else{
+  stats.b++;msg.className="bad";
+  msg.textContent=level===1?`아쉬워요! 정답은 ${cur.h}시예요.`:`아쉬워요! 정답은 ${cur.h}시 ${cur.m}분이에요.`;
+  showHint(h,m);update();nextBtn.style.display="block";
+ }
+}
+function showHint(h,m){
+ const hh=cur.h,mm=cur.m,nx=hh%12+1;
+ let t="";
+ if(mm===0){
+  t=`💡 긴바늘(분침)이 12를 가리키면 0분이에요.<br>짧은바늘(시침)이 <b>${hh}</b>를 가리키니까 <b>${hh}시</b>예요.`;
+ }else{
+  t=`💡 ① 긴바늘(분침)이 가리키는 숫자를 봐요. 숫자 1칸은 5분이에요. 지금은 <b>${mm}분</b>이에요.`+
+  (mm%5===0?` (${mm/5}×5=${mm})`:` (${Math.floor(mm/5)}까지 ${Math.floor(mm/5)*5}분, 눈금 ${mm%5}칸 더 → ${mm}분)`)+
+  `<br>② 짧은바늘(시침)은 <b>${hh}</b>와 <b>${nx}</b> 사이에 있어요. 아직 ${nx}에 도착하지 않았으니 <b>${hh}시</b>예요.`;
+ }
+ hint.innerHTML=t;hint.style.display="block";
+}
+function update(){sTotal.textContent=stats.t;sOk.textContent=stats.o;sBad.textContent=stats.b;
+ try{localStorage.setItem("clockStats",JSON.stringify(stats))}catch(e){}}
+
+// 풍선 + 폭죽
+const cv=document.getElementById("fx"),cx=cv.getContext("2d");let parts=[],anim=false;
+function size(){cv.width=innerWidth;cv.height=innerHeight}addEventListener("resize",size);size();
+function burst(){
+ const colors=["#ff5d5d","#ffb23d","#ffe14d","#5fd18a","#4db8ff","#b57aff","#ff7ac8"];
+ for(let i=0;i<10;i++)parts.push({k:"b",x:rand(30,cv.width-30),y:cv.height+30,vy:-(2+Math.random()*2.5),vx:(Math.random()-.5)*1,r:20+Math.random()*10,c:colors[rand(0,6)],ph:Math.random()*6});
+ for(let s=0;s<3;s++){const x=rand(80,cv.width-80),y=rand(100,cv.height*.5);
+  for(let i=0;i<36;i++){const a=i/36*Math.PI*2,sp=2+Math.random()*3.5;
+   parts.push({k:"f",x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:60,c:colors[rand(0,6)]})}}
+ if(!anim){anim=true;requestAnimationFrame(loop)}
+}
+function loop(){
+ cx.clearRect(0,0,cv.width,cv.height);
+ parts=parts.filter(p=>p.k==="b"?p.y>-60:p.life>0);
+ for(const p of parts){
+  if(p.k==="b"){p.y+=p.vy;p.ph+=.05;p.x+=p.vx+Math.sin(p.ph)*.6;
+   cx.fillStyle=p.c;cx.beginPath();cx.ellipse(p.x,p.y,p.r*.8,p.r,0,0,7);cx.fill();
+   cx.strokeStyle="rgba(120,120,120,.6)";cx.beginPath();cx.moveTo(p.x,p.y+p.r);cx.lineTo(p.x,p.y+p.r+30);cx.stroke();
+  }else{p.x+=p.vx;p.y+=p.vy;p.vy+=.06;p.life--;
+   cx.globalAlpha=Math.max(p.life/60,0);cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,3,0,7);cx.fill();cx.globalAlpha=1;}
+ }
+ if(parts.length)requestAnimationFrame(loop);else{anim=false;cx.clearRect(0,0,cv.width,cv.height)}
+}
+
+// UI
+const hIn=document.getElementById("h"),mIn=document.getElementById("m"),msg=document.getElementById("msg"),
+hint=document.getElementById("hint"),checkBtn=document.getElementById("check"),nextBtn=document.getElementById("next");
+const sTotal=document.getElementById("sTotal"),sOk=document.getElementById("sOk"),sBad=document.getElementById("sBad");
+const lvBox=document.getElementById("levels");
+LEVELS.forEach(L=>{const b=document.createElement("button");b.className="lv"+(L.n===1?" on":"");
+ b.innerHTML=`<b>${L.n}단계 ${L.t}</b><small>${L.d}</small>`;
+ b.onclick=()=>{level=L.n;[...lvBox.children].forEach((c,i)=>c.classList.toggle("on",i===level-1));newQ()};
+ lvBox.appendChild(b)});
+checkBtn.onclick=check;nextBtn.onclick=newQ;
+// +/- 버튼: 시는 1~12, 분은 0~59 사이에서 돌아가며 변경
+function stepVal(t,d){
+ if(locked)return;
+ const st=t==="h"?1:LEVELS[level-1].step;
+ const inp=t==="h"?hIn:mIn,lo=t==="h"?1:0,hi=t==="h"?12:60-st;
+ let v=inp.value===""?(d>0?lo:(t==="h"?hi:lo)):(+inp.value+d*st);
+ if(v>hi)v=lo;if(v<lo)v=hi;
+ inp.value=v;
+}
+document.querySelectorAll(".step").forEach(b=>{
+ let rep=null,first=null;
+ const go=()=>stepVal(b.dataset.t,+b.dataset.d);
+ const stop=()=>{clearTimeout(first);clearInterval(rep)};
+ b.addEventListener("pointerdown",e=>{e.preventDefault();go();first=setTimeout(()=>{rep=setInterval(go,120)},450)});
+ ["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,stop));
+});
+[hIn,mIn].forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")check()}));
+document.getElementById("reset").onclick=()=>{stats={t:0,o:0,b:0};update()};
+try{const s=JSON.parse(localStorage.getItem("clockStats"));if(s&&typeof s.t==="number")stats=s}catch(e){}
+update();buildClock();newQ();
+</script>
+</body>
+</html>
