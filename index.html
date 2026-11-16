@@ -1,0 +1,274 @@
+!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>이인영 | 개인 홈페이지</title>
+  <style>
+    /* ===== 색상 변수 ===== */
+    :root {
+      --ink: #1f2d2b;
+      --ink-soft: #52605d;
+      --paper: #f7f8f5;
+      --card: #ffffff;
+      --line: #d9dfd9;
+      --accent: #2f6f62;
+      --accent-light: #dcebe6;
+      --highlight: #f2d37a;
+    }
+
+    /* ===== 공통 스타일 (타입 선택자) ===== */
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    h1, h2, h3 { line-height: 1.3; margin: 0 0 0.6em; }
+    h1 { font-size: clamp(2.4rem, 7vw, 4rem); letter-spacing: -0.02em; }
+    h2 { font-size: 1.5rem; padding-bottom: 0.4rem; border-bottom: 3px solid var(--highlight); display: inline-block; }
+    h3 { font-size: 1.15rem; }
+    p, li { color: var(--ink-soft); margin: 0 0 0.6em; }
+    ul { padding-left: 1.2rem; margin: 0; }
+    a { color: var(--accent); }
+    a:focus-visible { outline: 3px solid var(--highlight); outline-offset: 2px; }
+
+    /* ===== 레이아웃 보조 (div) ===== */
+    .container { width: min(100% - 2.5rem, 960px); margin-inline: auto; }
+
+    /* ===== 머리말: 이름 + 소개 문구 ===== */
+    #site-header { background: var(--accent); color: #fff; padding: 4.5rem 0 3.5rem; }
+    #site-header h1 { color: #fff; }
+    #site-header p { color: var(--accent-light); font-size: 1.15rem; max-width: 36ch; }
+
+    /* ===== 메뉴 ===== */
+    #site-nav { position: sticky; top: 0; z-index: 10; background: var(--card); border-bottom: 1px solid var(--line); }
+    #site-nav ul { list-style: none; display: flex; gap: 0.25rem; padding: 0; margin: 0; overflow-x: auto; }
+    #site-nav a { display: block; padding: 0.9rem 1rem; color: var(--ink); text-decoration: none; font-weight: 600; white-space: nowrap; }
+    #site-nav a:hover { background: var(--accent-light); }
+
+    /* ===== 본문 영역 ===== */
+    main { padding: 1rem 0 3rem; }
+    main > section { padding: 2.5rem 0; border-bottom: 1px solid var(--line); }
+    main > section:last-child { border-bottom: none; }
+
+    /* ===== 관심사 / 활동 목록 ===== */
+    .tag-list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .tag-list li { margin: 0; padding: 0.35rem 1rem; background: var(--accent-light); color: var(--accent); border-radius: 999px; font-weight: 600; }
+
+    /* ===== 프로젝트 목록 (반복 항목: class) ===== */
+    .project-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+    .project-item { background: var(--card); border: 1px solid var(--line); border-left: 6px solid var(--accent); padding: 1.25rem 1.5rem; }
+    .project-item a { font-weight: 700; }
+
+    /* ===== 꼬리말 ===== */
+    #site-footer { background: var(--ink); padding: 2rem 0; }
+    #site-footer p { color: #b9c4c1; margin: 0; font-size: 0.9rem; }
+    #site-footer a { color: var(--highlight); }
+
+    /* ===== 반응형: 스마트폰 ===== */
+    @media (max-width: 640px) {
+      #site-header { padding: 3rem 0 2.5rem; }
+      .project-list { grid-template-columns: 1fr; }
+    }
+  </style>
+
+
+
+
+</head>
+<body>
+
+
+
+
+<!-- [SECTION: site-header] 이름 + 소개 문구 -->
+  <header id="site-header">
+    <div class="container">
+      <h1>이인영</h1>
+      <p>공주대 문헌정보교육과 25학번 이인영입니다.</p>
+    </div>
+  </header>
+
+  <!-- [SECTION: site-nav] 본문 이동 메뉴 -->
+  <nav id="site-nav" aria-label="본문 메뉴">
+    <div class="container">
+      <ul>
+        <li><a href="#sec-intro">소개</a></li>
+        <li><a href="#sec-interests">관심사</a></li>
+        <li><a href="#sec-activities">주요 활동</a></li>
+        <li><a href="#sec-projects">프로젝트</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+
+      <!-- [SECTION: sec-intro] 소개 -->
+      <section id="sec-intro">
+        <h2>소개</h2>
+        <p>공주대학교 문헌정보교육과 25학번 이인영입니다.</p>
+        <p>연락처: <a href="mailto:dlsdud0153@naver.com">dlsdud0153@naver.com</a></p>
+      </section>
+
+      <!-- [SECTION: sec-interests] 관심사 -->
+      <section id="sec-interests">
+        <h2>관심사</h2>
+        <ul class="tag-list">
+          <li>드라마</li>
+          <li>요리</li>
+        </ul>
+      </section>
+
+      <!-- [SECTION: sec-activities] 주요 활동 -->
+      <section id="sec-activities">
+        <h2>주요 활동</h2>
+        <ul>
+          <li>학과 근로</li>
+          <li>CCC 동아리 활동</li>
+        </ul>
+      </section>
+
+      <!-- [SECTION: sec-projects] 프로젝트 -->
+      <section id="sec-projects">
+        <h2>프로젝트</h2>
+        <div class="project-list">
+
+          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>오늘의 할 일 관리</h3>
+            <p>하루 동안 해야 할 일을 정리하고 관리하는 페이지입니다.</p>
+            <a href="todo.html" target="_blank" rel="noopener">오늘의 할 일</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->
+
+          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>디지털 이름 도장 생성 </h3>
+            <p>행정 서류 및 공문서 작성을 자주 처리하는 교사를 위한 도장 만들기</p>
+            <a href="code_artifact.html" target="file:///C:/Users/user/Downloads/code_artifact.html" rel="noopener">도장 만들기</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->
+
+           <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>명언을 보여주는 앱 만들기</h3>
+            <p>느낀 감정을 버튼으로 누르면 그 마음에 딱 맞는 글귀를 건네주는 감정 상태별 명언 추천 앱</p>
+            <a href="code_artifact_quote.html" target="file:file:///C:/Users/user/Downloads/code_artifact_quote.html" rel="noopener">명언 앱</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->
+          
+           <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>카드 뒤집기 게임 만들기</h3>
+            <p>카드 점수 계산, 다시 시작 기능 및 효과음이 적용된 웹 게임 제작</p>
+            <a href="kdc_card_game.html" target="file:///C:/Users/user/Downloads/kdc_card_game.html" rel="noopener">kdc 카드 게임</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->
+
+           <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>객관식 퀴즈 앱 만들기</h3>
+            <p>정/오답 판정 및 총점 표시 기능이 포함된 4지선다형 학습 퀴즈 앱</p>
+            <a href="독도의 날 퀴즈.html" target="file:file:///C:/Users/user/Downloads/%EB%8F%85%EB%8F%84%EC%9D%98%20%EB%82%A0%20%ED%80%B4%EC%A6%88.html">kdc 독도 퀴즈</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->
+
+           <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>인터액티브 연표 만들기</h3>
+            <p>사건을 클릭하면 팝업 설명이 뜨는 깔끔한 인터랙디브 연표 제작</p>
+            <a href="조선시대 인터랙티브 연표 도서관 역사.html" target="file:///C:/Users/user/Downloads/%EC%A1%B0%EC%84%A0%EC%8B%9C%EB%8C%80%20%EC%9D%B8%ED%84%B0%EB%9E%99%ED%8B%B0%EB%B8%8C%20%EC%97%B0%ED%91%9C%20%EB%8F%84%EC%84%9C%EA%B4%80%20%EC%97%AD%EC%82%AC.html">kdc 연표 보기</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->          
+
+           <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>디지털 리터러시 자기평가 레이더 차트 만들기</h3>
+            <p>학생 역량 지표 데이터를 다각형 차트로 시각화하고 사전/사후 결과를 겹쳐 비교하는 앱</p>
+            <a href="digital_literacy_radar.html" target="file:///C:/Users/user/Downloads/digital_literacy_radar.html">차트 보기</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->          
+
+          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>3D 주사위 시뮬레이터와 결과 집계 차트 만들기</h3>
+            <p>3D 회전 애니메이션 구현 및 확률 통계 표를 출력하는 앱</p>
+            <a href="주사위 확률 실험실.html" target="file:///C:/Users/user/Downloads/%EC%A3%BC%EC%82%AC%EC%9C%84%20%ED%99%95%EB%A5%A0%20%EC%8B%A4%ED%97%98%EC%8B%A4.html">차트 보기</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->   
+          
+          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>퀴즈형 반복학습 초등학생용 속담 이어서 말하기 게임</h3>
+            <p>속담의 앞 구절이 제시되면 뒷구절을 맞춰 정답을 완성하는 퀴즈 형태의 국어 어휘 학습 앱</p>
+            <a href="속담 이어 말하기 게임.html" target="file:///C:/Users/user/Downloads/%EC%86%8D%EB%8B%B4%20%EC%9D%B4%EC%96%B4%20%EB%A7%90%ED%95%98%EA%B8%B0%20%EA%B2%8C%EC%9E%84.html.html">차트 보기</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 --> 
+         
+          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>인터랙티브 수학 연산 학습 웹 앱(수학 대모험 게임)</h3>
+            <p>게임화 요소를 결합하여 학생들이 덧셈, 뺄셈, 곰셈, 나눗셈 연산을 지루한 반복 학습이 아닌 게임처럼 즐기며 풀 수 있도록 돕는 웹 앱</p>
+            <a href="수학 대모험.html" target="file:///C:/Users/user/Downloads/%EC%88%98%ED%95%99%20%EB%8C%80%EB%AA%A8%ED%97%98.html">차트 보기</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 --> 
+
+            <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>초등학교 저학년 시계 읽기 연습 앱</h3>
+            <p>분침의 이동 각도에 따라 시침이 연동되어 움직이는 아날로그 시계를 보고 읽는 연습을 반복하는 초등 수학 보조 교구 웹 앱</p>
+            <a href="시계 읽기 연습.html" target="file:///C:/Users/user/Downloads/%EC%8B%9C%EA%B3%84%20%EC%9D%BD%EA%B8%B0%20%EC%97%B0%EC%8A%B5.html">차트 보기</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 --> 
+
+          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>제미나이 기반 AI 캐치마인드(그림 맞추기) 앱</h3>
+            <p>사용자가 제시어를 보고 캔버스에 그림으로 그리면 AI가 실시간으로 그림을 분석하여 정답을 추측하고 맞춰보는 대화형 그림 퀴즈 웹 앱</p>
+            <a href="ai_catch_mind_game.html" target="https://share.gemini.google/tX2mTFYPPN1M">차트 보기</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 --> 
+
+          
+          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
+          <article class="project-item" id="project-todo">
+            <h3>클로드 기반 칼로리를 자동 계산해주는 칼로리 앱 만들기</h3>
+            <p>음식 사진 한 장을 올리면 AI가 음식을 알아보고, 칼로리와 영양성분(탄수화물, 단백질, 지방)을 추정해 알려주는 웹 앱</p>
+            <a href="사진 칼로리 계산.html" target="https://claude.ai/artifact/9xzLrfdaCQpqDLp2ZiLSvj">차트 보기</a>
+          </article>
+
+          <!-- 프로젝트 추가 시 위 article을 복사해 사용 --> 
+
+          
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- [SECTION: site-footer] 제작 정보 -->
+  <footer id="site-footer">
+    <div class="container">
+      <p>제작: 이인영 | 공주대학교 문헌정보교육과 | 문의: <a href="mailto:dlsdud0153@naver.com">dlsdud0153@naver.com</a></p>
+    </div>
+  </footer>
+
+
