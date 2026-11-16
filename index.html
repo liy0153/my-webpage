@@ -1,268 +1,184 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>이인영 | 개인 홈페이지</title>
-  <style>
-    /* ===== 색상 변수 ===== */
-    :root {
-      --ink: #1f2d2b;
-      --ink-soft: #52605d;
-      --paper: #f7f8f5;
-      --card: #ffffff;
-      --line: #d9dfd9;
-      --accent: #2f6f62;
-      --accent-light: #dcebe6;
-      --highlight: #f2d37a;
-    }
-
-    /* ===== 공통 스타일 (타입 선택자) ===== */
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
-    body {
-      margin: 0;
-      font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
-      font-size: 1rem;
-      line-height: 1.75;
-      color: var(--ink);
-      background: var(--paper);
-    }
-    h1, h2, h3 { line-height: 1.3; margin: 0 0 0.6em; }
-    h1 { font-size: clamp(2.4rem, 7vw, 4rem); letter-spacing: -0.02em; }
-    h2 { font-size: 1.5rem; padding-bottom: 0.4rem; border-bottom: 3px solid var(--highlight); display: inline-block; }
-    h3 { font-size: 1.15rem; }
-    p, li { color: var(--ink-soft); margin: 0 0 0.6em; }
-    ul { padding-left: 1.2rem; margin: 0; }
-    a { color: var(--accent); }
-    a:focus-visible { outline: 3px solid var(--highlight); outline-offset: 2px; }
-
-    /* ===== 레이아웃 보조 (div) ===== */
-    .container { width: min(100% - 2.5rem, 960px); margin-inline: auto; }
-
-    /* ===== 머리말: 이름 + 소개 문구 ===== */
-    #site-header { background: var(--accent); color: #fff; padding: 4.5rem 0 3.5rem; }
-    #site-header h1 { color: #fff; }
-    #site-header p { color: var(--accent-light); font-size: 1.15rem; max-width: 36ch; }
-
-    /* ===== 메뉴 ===== */
-    #site-nav { position: sticky; top: 0; z-index: 10; background: var(--card); border-bottom: 1px solid var(--line); }
-    #site-nav ul { list-style: none; display: flex; gap: 0.25rem; padding: 0; margin: 0; overflow-x: auto; }
-    #site-nav a { display: block; padding: 0.9rem 1rem; color: var(--ink); text-decoration: none; font-weight: 600; white-space: nowrap; }
-    #site-nav a:hover { background: var(--accent-light); }
-
-    /* ===== 본문 영역 ===== */
-    main { padding: 1rem 0 3rem; }
-    main > section { padding: 2.5rem 0; border-bottom: 1px solid var(--line); }
-    main > section:last-child { border-bottom: none; }
-
-    /* ===== 관심사 / 활동 목록 ===== */
-    .tag-list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.6rem; }
-    .tag-list li { margin: 0; padding: 0.35rem 1rem; background: var(--accent-light); color: var(--accent); border-radius: 999px; font-weight: 600; }
-
-    /* ===== 프로젝트 목록 (반복 항목: class) ===== */
-    .project-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
-    .project-item { background: var(--card); border: 1px solid var(--line); border-left: 6px solid var(--accent); padding: 1.25rem 1.5rem; }
-    .project-item a { font-weight: 700; }
-
-    /* ===== 꼬리말 ===== */
-    #site-footer { background: var(--ink); padding: 2rem 0; }
-    #site-footer p { color: #b9c4c1; margin: 0; font-size: 0.9rem; }
-    #site-footer a { color: var(--highlight); }
-
-    /* ===== 반응형: 스마트폰 ===== */
-    @media (max-width: 640px) {
-      #site-header { padding: 3rem 0 2.5rem; }
-      .project-list { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="utf-8">
+<title>운동 체크리스트</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f9e6f">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="운동기록">
+<style>
+:root{--bg:#f6f7f5;--card:#fff;--tx:#1d2420;--sub:#6b756f;--ac:#2f9e6f;--ac2:#dff3e9;--bd:#e3e7e4;--dn:#d64545;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121614;--card:#1b211e;--tx:#e8eeea;--sub:#93a09a;--ac:#3fbf8a;--ac2:#1f3a2e;--bd:#2a332e;--dn:#ef6b6b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121614;--card:#1b211e;--tx:#e8eeea;--sub:#93a09a;--ac:#3fbf8a;--ac2:#1f3a2e;--bd:#2a332e;--dn:#ef6b6b;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.45}
+main{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:4px 0 12px}
+h2{font-size:15px;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:flex;align-items:center;gap:8px}
+.sp{flex:1}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:9px 14px;font-weight:600}
+.ico{background:none;border:0;color:var(--sub);font-size:18px;padding:4px 8px}
+input,select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:9px 10px;min-width:0}
+.bar{height:8px;background:var(--bd);border-radius:6px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--ac);width:0;transition:width .25s}
+.sum{font-size:22px;font-weight:700}
+.sub{color:var(--sub);font-size:13px}
+.item{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--bd)}
+.item:first-child{border-top:0}
+.chk{width:26px;height:26px;border-radius:8px;border:2px solid var(--bd);background:var(--bg);color:#fff;font-size:16px;line-height:1;flex:none;display:grid;place-items:center}
+.item.done .chk{background:var(--ac);border-color:var(--ac)}
+.item.done .nm{color:var(--sub);text-decoration:line-through}
+.nm{flex:1;word-break:break-all}
+.val{width:72px;text-align:right}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal .h{font-size:12px;color:var(--sub)}
+.d{aspect-ratio:1;border-radius:10px;border:1px solid transparent;background:var(--bg);font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+.d.e{background:none;pointer-events:none}
+.d.t{border-color:var(--ac)}
+.d.s{outline:2px solid var(--ac)}
+.d b{width:60%;height:4px;border-radius:3px;background:var(--bd);overflow:hidden;display:block}
+.d b i{display:block;height:100%;background:var(--ac)}
+.chart{display:flex;align-items:flex-end;gap:2px;height:90px;margin-top:8px;overflow-x:auto}
+.chart div{flex:1;min-width:6px;background:var(--ac);border-radius:3px 3px 0 0;min-height:2px}
+.chart div.z{background:var(--bd)}
+.st{display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--bd);font-size:14px}
+.add{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.add input{flex:1;min-width:120px}
+</style>
 </head>
 <body>
+<main>
+<h1>💪 운동 체크리스트</h1>
 
-  <!-- [SECTION: site-header] 이름 + 소개 문구 -->
-  <header id="site-header">
-    <div class="container">
-      <h1>이인영</h1>
-      <p>공주대 문헌정보교육과 25학번 이인영입니다.</p>
-    </div>
-  </header>
+<section class="card">
+  <div class="sub" id="dateLabel"></div>
+  <div class="sum" id="sum"></div>
+  <div class="bar"><i id="prog"></i></div>
+</section>
 
-  <!-- [SECTION: site-nav] 본문 이동 메뉴 -->
-  <nav id="site-nav" aria-label="본문 메뉴">
-    <div class="container">
-      <ul>
-        <li><a href="#sec-intro">소개</a></li>
-        <li><a href="#sec-interests">관심사</a></li>
-        <li><a href="#sec-activities">주요 활동</a></li>
-        <li><a href="#sec-projects">프로젝트</a></li>
-      </ul>
-    </div>
-  </nav>
+<section class="card">
+  <h2>운동 목록</h2>
+  <div id="list"></div>
+  <div class="add">
+    <input id="newName" placeholder="운동 이름 (예: 달리기)" maxlength="20">
+    <select id="newUnit" aria-label="단위">
+      <option value="">체크만</option><option>개</option><option>km</option><option>분</option><option>kg</option><option>세트</option>
+    </select>
+    <button class="btn" id="addBtn">추가</button>
+  </div>
+</section>
 
-  <main>
-    <div class="container">
+<section class="card">
+  <div class="row">
+    <button class="ico" id="prev" aria-label="이전 달">◀</button>
+    <div class="sp" style="text-align:center;font-weight:600" id="monthLabel"></div>
+    <button class="ico" id="next" aria-label="다음 달">▶</button>
+  </div>
+  <div class="cal" id="cal" style="margin-top:8px"></div>
+</section>
 
-      <!-- [SECTION: sec-intro] 소개 -->
-      <section id="sec-intro">
-        <h2>소개</h2>
-        <p>공주대학교 문헌정보교육과 25학번 이인영입니다.</p>
-        <p>연락처: <a href="mailto:dlsdud0153@naver.com">dlsdud0153@naver.com</a></p>
-      </section>
+<section class="card">
+  <h2>월간 통계</h2>
+  <div class="sub">일별 완료 개수</div>
+  <div class="chart" id="chart"></div>
+  <div id="stats" style="margin-top:12px"></div>
+</section>
 
-      <!-- [SECTION: sec-interests] 관심사 -->
-      <section id="sec-interests">
-        <h2>관심사</h2>
-        <ul class="tag-list">
-          <li>드라마</li>
-          <li>요리</li>
-        </ul>
-      </section>
+<p class="sub" style="text-align:center">기록은 이 기기의 브라우저에 자동 저장돼요. 홈 화면에 추가하면 앱처럼 쓸 수 있어요.</p>
+</main>
+<script>
+(function(){
+var KEY='workout-v1',S={ex:[],logs:{}};
+try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&p.ex&&p.logs)S=p}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function pad(n){return n<10?'0'+n:''+n}
+function ds(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+var todayStr=ds(new Date()),sel=todayStr,now=new Date(),vy=now.getFullYear(),vm=now.getMonth();
+function $(id){return document.getElementById(id)}
+function log(date,id){var l=S.logs[date]||(S.logs[date]={});return l[id]||(l[id]={done:false,val:''})}
+function peek(date,id){var l=S.logs[date];return l&&l[id]}
+function doneCount(date){var n=0;S.ex.forEach(function(e){var r=peek(date,e.id);if(r&&r.done)n++});return n}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 
-      <!-- [SECTION: sec-activities] 주요 활동 -->
-      <section id="sec-activities">
-        <h2>주요 활동</h2>
-        <ul>
-          <li>학과 근로</li>
-          <li>CCC 동아리 활동</li>
-        </ul>
-      </section>
+function renderToday(){
+  var w=['일','월','화','수','목','금','토'],d=new Date(sel+'T00:00:00');
+  $('dateLabel').textContent=(d.getMonth()+1)+'월 '+d.getDate()+'일 ('+w[d.getDay()]+')'+(sel===todayStr?' · 오늘':'');
+  var n=doneCount(sel),t=S.ex.length;
+  $('sum').textContent=t?('완료 '+n+' / '+t):'운동을 추가해 보세요';
+  $('prog').style.width=(t?n/t*100:0)+'%';
+  var L=$('list');L.textContent='';
+  if(!t){L.appendChild(el('div','sub','아직 등록된 운동이 없어요.'));return}
+  S.ex.forEach(function(e){
+    var r=peek(sel,e.id)||{done:false,val:''};
+    var it=el('div','item'+(r.done?' done':''));
+    var c=el('button','chk',r.done?'✓':'');c.setAttribute('aria-label',e.name+' 완료 체크');
+    c.onclick=function(){var x=log(sel,e.id);x.done=!x.done;save();renderAll()};
+    it.appendChild(c);it.appendChild(el('div','nm',e.name));
+    if(e.unit){
+      var i=el('input','val');i.type='number';i.min='0';i.step='any';i.inputMode='decimal';i.placeholder='0';i.value=r.val;
+      i.oninput=function(){var x=log(sel,e.id);x.val=i.value;save();renderStats()};
+      i.onchange=renderAll;
+      it.appendChild(i);it.appendChild(el('span','sub',e.unit));
+    }
+    var x=el('button','ico','✕');x.setAttribute('aria-label',e.name+' 삭제');
+    x.onclick=function(){if(confirm('"'+e.name+'" 항목을 삭제할까요?')){S.ex=S.ex.filter(function(q){return q.id!==e.id});save();renderAll()}};
+    it.appendChild(x);L.appendChild(it);
+  });
+}
+function renderCal(){
+  $('monthLabel').textContent=vy+'년 '+(vm+1)+'월';
+  var C=$('cal');C.textContent='';
+  ['일','월','화','수','목','금','토'].forEach(function(w){C.appendChild(el('div','h',w))});
+  var first=new Date(vy,vm,1).getDay(),days=new Date(vy,vm+1,0).getDate();
+  for(var i=0;i<first;i++)C.appendChild(el('div','d e'));
+  for(var d=1;d<=days;d++){
+    (function(d){
+      var s=vy+'-'+pad(vm+1)+'-'+pad(d),b=el('button','d'+(s===todayStr?' t':'')+(s===sel?' s':''),d);
+      var n=doneCount(s),t=S.ex.length,bar=el('b'),f=el('i');f.style.width=(t?Math.min(100,n/t*100):0)+'%';bar.appendChild(f);b.appendChild(bar);
+      b.onclick=function(){sel=s;renderAll()};C.appendChild(b);
+    })(d);
+  }
+}
+function renderStats(){
+  var days=new Date(vy,vm+1,0).getDate(),max=Math.max(1,S.ex.length),CH=$('chart');CH.textContent='';
+  for(var d=1;d<=days;d++){
+    var s=vy+'-'+pad(vm+1)+'-'+pad(d),n=doneCount(s),b=el('div',n?'':'z');
+    b.style.height=(n?Math.max(8,n/max*100):2)+'%';b.title=d+'일: '+n+'개';CH.appendChild(b);
+  }
+  var T=$('stats');T.textContent='';
+  if(!S.ex.length){T.appendChild(el('div','sub','통계가 여기에 표시돼요.'));return}
+  S.ex.forEach(function(e){
+    var dn=0,sum=0;
+    for(var d=1;d<=days;d++){var r=peek(vy+'-'+pad(vm+1)+'-'+pad(d),e.id);if(r&&r.done)dn++;if(r&&r.val)sum+=parseFloat(r.val)||0}
+    var row=el('div','st');row.appendChild(el('span','',e.name));
+    row.appendChild(el('span','sub',dn+'일 완료'+(e.unit?' · 누적 '+Math.round(sum*100)/100+e.unit:'')));
+    T.appendChild(row);
+  });
+}
+function renderAll(){renderToday();renderCal();renderStats()}
 
-      <!-- [SECTION: sec-projects] 프로젝트 -->
-      <section id="sec-projects">
-        <h2>프로젝트</h2>
-        <div class="project-list">
-
-          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>오늘의 할 일 관리</h3>
-            <p>하루 동안 해야 할 일을 정리하고 관리하는 페이지입니다.</p>
-            <a href="todo.html" target="_blank" rel="noopener">오늘의 할 일</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->
-
-          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>디지털 이름 도장 생성 </h3>
-            <p>행정 서류 및 공문서 작성을 자주 처리하는 교사를 위한 도장 만들기</p>
-            <a href="code_artifact.html" target="file:///C:/Users/user/Downloads/code_artifact.html" rel="noopener">도장 만들기</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->
-
-           <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>명언을 보여주는 앱 만들기</h3>
-            <p>느낀 감정을 버튼으로 누르면 그 마음에 딱 맞는 글귀를 건네주는 감정 상태별 명언 추천 앱</p>
-            <a href="code_artifact_quote.html" target="file:file:///C:/Users/user/Downloads/code_artifact_quote.html" rel="noopener">명언 앱</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->
-          
-           <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>카드 뒤집기 게임 만들기</h3>
-            <p>카드 점수 계산, 다시 시작 기능 및 효과음이 적용된 웹 게임 제작</p>
-            <a href="kdc_card_game.html" target="file:///C:/Users/user/Downloads/kdc_card_game.html" rel="noopener">kdc 카드 게임</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->
-
-           <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>객관식 퀴즈 앱 만들기</h3>
-            <p>정/오답 판정 및 총점 표시 기능이 포함된 4지선다형 학습 퀴즈 앱</p>
-            <a href="독도의 날 퀴즈.html" target="file:file:///C:/Users/user/Downloads/%EB%8F%85%EB%8F%84%EC%9D%98%20%EB%82%A0%20%ED%80%B4%EC%A6%88.html">kdc 독도 퀴즈</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->
-
-           <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>인터액티브 연표 만들기</h3>
-            <p>사건을 클릭하면 팝업 설명이 뜨는 깔끔한 인터랙디브 연표 제작</p>
-            <a href="조선시대 인터랙티브 연표 도서관 역사.html" target="file:///C:/Users/user/Downloads/%EC%A1%B0%EC%84%A0%EC%8B%9C%EB%8C%80%20%EC%9D%B8%ED%84%B0%EB%9E%99%ED%8B%B0%EB%B8%8C%20%EC%97%B0%ED%91%9C%20%EB%8F%84%EC%84%9C%EA%B4%80%20%EC%97%AD%EC%82%AC.html">kdc 연표 보기</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->          
-
-           <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>디지털 리터러시 자기평가 레이더 차트 만들기</h3>
-            <p>학생 역량 지표 데이터를 다각형 차트로 시각화하고 사전/사후 결과를 겹쳐 비교하는 앱</p>
-            <a href="digital_literacy_radar.html" target="file:///C:/Users/user/Downloads/digital_literacy_radar.html">차트 보기</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->          
-
-          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>3D 주사위 시뮬레이터와 결과 집계 차트 만들기</h3>
-            <p>3D 회전 애니메이션 구현 및 확률 통계 표를 출력하는 앱</p>
-            <a href="주사위 확률 실험실.html" target="file:///C:/Users/user/Downloads/%EC%A3%BC%EC%82%AC%EC%9C%84%20%ED%99%95%EB%A5%A0%20%EC%8B%A4%ED%97%98%EC%8B%A4.html">차트 보기</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 -->   
-          
-          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>퀴즈형 반복학습 초등학생용 속담 이어서 말하기 게임</h3>
-            <p>속담의 앞 구절이 제시되면 뒷구절을 맞춰 정답을 완성하는 퀴즈 형태의 국어 어휘 학습 앱</p>
-            <a href="속담 이어 말하기 게임.html" target="file:///C:/Users/user/Downloads/%EC%86%8D%EB%8B%B4%20%EC%9D%B4%EC%96%B4%20%EB%A7%90%ED%95%98%EA%B8%B0%20%EA%B2%8C%EC%9E%84.html.html">차트 보기</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 --> 
-         
-          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>인터랙티브 수학 연산 학습 웹 앱(수학 대모험 게임)</h3>
-            <p>게임화 요소를 결합하여 학생들이 덧셈, 뺄셈, 곰셈, 나눗셈 연산을 지루한 반복 학습이 아닌 게임처럼 즐기며 풀 수 있도록 돕는 웹 앱</p>
-            <a href="수학 대모험.html" target="file:///C:/Users/user/Downloads/%EC%88%98%ED%95%99%20%EB%8C%80%EB%AA%A8%ED%97%98.html">차트 보기</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 --> 
-
-            <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>초등학교 저학년 시계 읽기 연습 앱</h3>
-            <p>분침의 이동 각도에 따라 시침이 연동되어 움직이는 아날로그 시계를 보고 읽는 연습을 반복하는 초등 수학 보조 교구 웹 앱</p>
-            <a href="시계 읽기 연습.html" target="file:///C:/Users/user/Downloads/%EC%8B%9C%EA%B3%84%20%EC%9D%BD%EA%B8%B0%20%EC%97%B0%EC%8A%B5.html">차트 보기</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 --> 
-
-          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>제미나이 기반 AI 캐치마인드(그림 맞추기) 앱</h3>
-            <p>사용자가 제시어를 보고 캔버스에 그림으로 그리면 AI가 실시간으로 그림을 분석하여 정답을 추측하고 맞춰보는 대화형 그림 퀴즈 웹 앱</p>
-            <a href="ai_catch_mind_game.html" target="https://share.gemini.google/tX2mTFYPPN1M">차트 보기</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 --> 
-
-          
-          <!-- [ITEM: project-todo] 오늘의 할 일 관리 -->
-          <article class="project-item" id="project-todo">
-            <h3>클로드 기반 칼로리를 자동 계산해주는 칼로리 앱 만들기</h3>
-            <p>음식 사진 한 장을 올리면 AI가 음식을 알아보고, 칼로리와 영양성분(탄수화물, 단백질, 지방)을 추정해 알려주는 웹 앱</p>
-            <a href="사진 칼로리 계산.html" target="https://claude.ai/artifact/9xzLrfdaCQpqDLp2ZiLSvj">차트 보기</a>
-          </article>
-
-          <!-- 프로젝트 추가 시 위 article을 복사해 사용 --> 
-
-          
-        </div>
-      </section>
-
-    </div>
-  </main>
-
-  <!-- [SECTION: site-footer] 제작 정보 -->
-  <footer id="site-footer">
-    <div class="container">
-      <p>제작: 이인영 | 공주대학교 문헌정보교육과 | 문의: <a href="mailto:dlsdud0153@naver.com">dlsdud0153@naver.com</a></p>
-    </div>
-  </footer>
-
+$('addBtn').onclick=function(){
+  var n=$('newName').value.trim();if(!n)return;
+  S.ex.push({id:Date.now().toString(36),name:n,unit:$('newUnit').value});
+  $('newName').value='';save();renderAll();
+};
+$('newName').onkeydown=function(e){if(e.key==='Enter')$('addBtn').click()};
+$('prev').onclick=function(){vm--;if(vm<0){vm=11;vy--}renderAll()};
+$('next').onclick=function(){vm++;if(vm>11){vm=0;vy++}renderAll()};
+renderAll();
+})();
+</script>
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+</script>
 </body>
 </html>
